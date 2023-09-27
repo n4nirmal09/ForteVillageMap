@@ -1,0 +1,117 @@
+//- Master layout
+
+doctype html
+html(lang='en')
+  head
+
+    //- Meta
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1')
+    meta(http-equiv='X-UA-Compatible' content='ie=edge')
+
+    meta(name='msapplication-TileColor' content='#0E0E0E')
+    meta(name='theme-color' content='#0E0E0E')
+
+    //- SEO
+
+    //- Basic Seo
+    block basicSeo
+      meta(name='description' content='Index page')
+      meta(name='keywords' content='index, page')
+      meta(name='author' content='')
+
+    //- Twitter
+    meta(name='twitter:card' content='summary')
+    meta(name='twitter:site' content='')
+    meta(name='twitter:image' content='')
+    meta(name='twitter:description' content='')
+
+    //- Facebook
+    meta(property='og:url' content='')
+    meta(property='og:title' content='')
+    meta(property='og:description' content='')
+    meta(property='og:image' content='')
+    meta(property='og:type' content='website')
+
+
+    //- Favicons
+    link(rel='apple-touch-icon' sizes='180x180' href='./images/icons/apple-icon-60x60.png')
+    link(rel='icon' type='image/png' sizes='96x96' href='./images/icons/favicon-96x96.png')
+    link(rel='icon' type='image/png' sizes='32x32' href='./images/icons/favicon-32x32.png')
+    link(rel='icon' type='image/png' sizes='16x16' href='./images/icons/favicon-16x16.png')
+    link(rel='shortcut icon' href='./images/icons/favicon.ico')
+
+    //- Font
+
+
+    //- Manifest browserconfig files
+    block manifestBrowserconfigFiles
+      link(rel='manifest' href='/manifest.json')
+      meta(name='msapplication-config' content='/browserconfig.xml')   
+
+    //- Root Styles
+    style. 
+      .body-container-wrapper:not(.loaded) {
+        opacity: 0;
+        visibility: hidden;
+      } 
+
+      :root {
+        --body-background: #fff;
+        --body-color: #051A26;
+        --header-font: 'Parmigiano Headline Std Reg';
+        --header-font-secondary: 'Parmigiano Headline Std Reg';
+        --base-font: 'Parmigiano Sans Std Reg';
+        --theme-light: #fff;
+        --theme-dark: #091F2C;
+      } 
+    noscript 
+      .container
+        h1 Please enable Javascript
+
+    //- Title
+    block title
+      title ForteVillageMap
+
+  body
+    .body-container-wrapper
+      .body-scrollable-area
+        <!-- Main Header-->
+        block header
+        <!-- Main Navigation -->
+        block navigation
+        <!-- Main Block-->
+        main.main-content
+          <!-- Vertical Navigation -->
+          block vertical-navigation
+          <!-- Main Content -->
+          block content
+        <!-- Main footer -->
+        block footer
+    //- block scripts
+    block scripts
+    //- Plugins
+    script.
+      function isIE() {
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf('MSIE ');
+        if (msie > 0) {
+        // IE 10 or older => return version number
+        return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+        }
+        var trident = ua.indexOf('Trident/');
+        if (trident > 0) {
+        // IE 11 => return version number
+        var rv = ua.indexOf('rv:');
+        return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+        }
+        var edge = ua.indexOf('Edge/');
+        if (edge > 0) {
+        // Edge (IE 12+) => return version number
+        return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+        }
+        // other browser
+        return false;
+      }
+      if(isIE()  && isIE() < 14) alert('This Site is not compatible with this Browser. Please upgrade your browser or use different one.')
+    script(src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js")

@@ -1,0 +1,38 @@
+.bg-img {
+    background-size: cover;
+    
+    &--preload {
+        @include media-breakpoint-down(lg) {
+            animation      : animatedBackground 20s linear infinite;
+            background-size: 60% auto !important;
+
+        }
+
+        animation            : animatedBackground 40s linear infinite;
+        background-attachment: scroll !important;
+        background-color     : transparent !important;
+        background-image     : url('#{$image-path}/preload_pattern.png') !important;
+        background-repeat    : repeat !important;
+        background-size      : 20% auto !important;
+    }
+
+    &--preload-small {
+        @extend .bg-img--preload;
+        background-size: 60% auto !important;
+        animation      : animatedBackground 5s linear infinite;
+    }
+
+    &--contain-native {
+        position: relative;
+        z-index : 1;
+
+        >.bg-img__img {
+            position  : absolute;
+            left      : 0;
+            top       : 0;
+            width     : 100%;
+            height    : 100%;
+            object-fit: cover;
+        }
+    }
+}

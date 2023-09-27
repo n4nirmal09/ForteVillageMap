@@ -1,0 +1,1 @@
+export const INSTA_URL = "/js/instagram.json"

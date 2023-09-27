@@ -1,0 +1,8 @@
+extends ../blocks/popup-block.pug
+block popupContent
+	p You are about to visit a third-party website (outside of Healthcare at Home).
+	p Please note that Healthcare at Home has no control over the content or management of third-party websites so cannot be held responsible or liable for such content or management.
+	p If you wish to continue, press continue, otherwise press stay here.
+block popupAction
+	a.btn.btn-primary.text-light.btn-rounded CONTINUE
+	a.btn.btn-primary.text-light.btn-rounded(onClick="callAlertPopup(event,'#alert-popup')") STAY HERE

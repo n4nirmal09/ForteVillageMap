@@ -1,0 +1,161 @@
+.reveal-animate,
+[data-animation='parallax'] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes moveLoaderStripGradient { 
+  100% {
+    background-position: -200% 50%;
+  }
+}
+
+@keyframes gradient-animation-a {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes animatedBackground {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes icon-move-right {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  10% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  80% {
+    opacity: 1;
+    transform: translateX(10px);
+
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(12px);
+
+  }
+}
+
+@keyframes icon-move-left {
+  0% {
+    opacity: 0;
+    transform: rotate(180deg) translateX(0);
+  }
+
+  10% {
+    opacity: 0;
+    transform: rotate(180deg) translateX(0);
+  }
+
+  80% {
+    opacity: 1;
+    transform: rotate(180deg) translateX(10px);
+
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotate(180deg) translateX(12px);
+
+  }
+}
+
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(.5);
+   
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoomOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+
+@keyframes placeHolderShimmer {
+  0% {
+      transform: translateZ(0);
+      background-position: -468px 0
+  }
+  to {
+      transform: translateZ(0);
+      background-position: 468px 0
+  }
+}
+
+
+@keyframes headeroutlineleft {
+  0% {
+    transform-origin: right center;
+    transform: scaleX(0);
+  }
+  100% {
+    transform-origin: right center;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes headeroutlineright {
+  0% {
+    transform-origin: left center;
+    transform: scaleX(0);
+  }
+  100% {
+    transform-origin: left center;
+    transform: scaleX(1);
+  }
+}
+
+// Fade in
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+// Rotate
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}

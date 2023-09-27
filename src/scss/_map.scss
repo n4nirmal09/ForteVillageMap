@@ -1,0 +1,93 @@
+$modal-content-padding: 15px;
+.interactive-map {
+
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    overflow: hidden;
+    
+
+    &__canvas {
+        height: 100%;
+        transition: filter 0.3s ease;
+    }
+
+    &--loading {
+        .interactive-map {
+            &__canvas {
+                filter: blur(10px);
+            }
+        }
+        
+    }
+
+    
+
+    &__loader {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: fade-out($color: #fff, $amount: 0.5);
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    &-modal {
+        position: absolute;
+        width: 30%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 5px 0 5px 2px fade-out($color: #000000, $amount: 0.8);
+
+        &__header {
+            flex: 0 0 auto;
+            padding: $modal-content-padding;
+        }
+
+        &__body {
+            flex: 1; 
+            overflow: hidden;
+            overflow-y: auto;
+            padding: 0 $modal-content-padding;
+        }
+
+        &__action {
+            margin-top:  auto;
+            padding: $modal-content-padding;
+        }
+
+        transition: ease-in-out 0.3s ;
+        transform: translateX(-100%);
+        box-shadow: none;
+
+        &--show {
+            transform: translateX(0);
+            box-shadow: 5px 0 5px 2px fade-out($color: #000000, $amount: 0.8);
+        }
+
+        &__header {
+            display: flex;
+            flex-wrap: wrap;
+            &-title {
+                flex: 1;
+                margin-bottom: 0;
+            }
+    
+            &-close {
+                flex: 0 0 auto;
+                align-self: flex-start;
+            }
+        }
+    }
+
+}

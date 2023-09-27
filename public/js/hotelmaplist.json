@@ -1,0 +1,169 @@
+[
+    {
+        "country": "italy",
+        "hotels": [
+            {
+                "state": "rome",
+                "name": "Le jardin de russie",
+                "latitude": 41.9099,
+                "longitude": 12.4775,
+                "featuredImage": "https://via.placeholder.com/722x542",
+                "link": "#jardin",
+                "address": "rome, italy",
+                "type": "resorts",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            },
+            {
+                "state": "rome",
+                "name": "Hotel De Russie",
+                "latitude": 41.8088,
+                "longitude": 12.4776,
+                "featuredImage": "https://via.placeholder.com/1024x768",
+                "link": "#",
+                "type": "resorts",
+                "address": "rome, italy",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            },
+            {
+                "state": "rome",
+                "name": "Hotel De La Ville",
+                "latitude": 41.9058,
+                "longitude": 12.4843,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "restaurants",
+                "address": "rome, italy",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            },
+            {
+                "state": "Florence",
+                "name": "Hotel Savoy",
+                "latitude": 43.7719,
+                "longitude": 11.2546,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "resorts",
+                "address": "rome, italy",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            },
+            {
+                "state": "Puglia",
+                "name": "Masseria Torre Maizza",
+                "latitude": 40.7928,
+                "longitude": 17.1012,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "restaurants",
+                "address": "rome, italy",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            },
+            {
+                "state": "Sicily",
+                "name": "Verdura Resort",
+                "latitude": 37.6000,
+                "longitude": 14.0154,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "resorts",
+                "address": "rome, italy",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            },
+            {
+                "state": "Sicily",
+                "name": "Villa Igiea, Palermo",
+                "latitude": 37.6002,
+                "longitude": 14.0154,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "restaurants",
+                "address": "rome, italy",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            }
+        ]
+    },
+    {
+        "country": "Belgium",
+        "hotels": [
+            {
+                "state": "brussels",
+                "name": "Hotel amigo",
+                "latitude": 50.8462,
+                "longitude": 4.3513,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "resorts",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            },
+            {
+                "state": "brussels",
+                "name": "Hotel amigo b",
+                "latitude": 50.848,
+                "longitude": 4.3516,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "restaurants",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            }
+        ]
+    },
+    {
+        "country": "Russia",
+        "hotels": [
+            {
+                "state": "ST petersburg",
+                "name": "Hotel astoria a",
+                "latitude": 64.5240,
+                "longitude": 108.3188,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "restaurants",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            }
+        ]
+    },
+    {
+        "country": "Russia",
+        "hotels": [
+            {
+                "state": "ST petersburg",
+                "name": "Hotel astoria b",
+                "latitude": 61.52401,
+                "longitude": 105.31889,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "restaurants",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            }
+        ]
+    },
+    {
+        "country": "Country-a",
+        "hotels": [
+            {
+                "state": "Country-a State-a",
+                "name": "Hotel astoria c",
+                "latitude": 61.689,
+                "longitude": 105.3168,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "restaurants",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            }
+        ]
+    },
+    {
+        "country": "Country-b",
+        "hotels": [
+            {
+                "state": "Country-b State-a",
+                "name": "Hotel astoria resort",
+                "latitude": 62.5230,
+                "longitude": 106.3178,
+                "featuredImage": "/images/AlbertoBlasettiPh.png",
+                "link": "#",
+                "type": "resorts",
+                "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+            }
+        ]
+    }
+]

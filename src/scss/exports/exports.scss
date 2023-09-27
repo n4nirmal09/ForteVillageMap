@@ -1,0 +1,16 @@
+@import '../base/variables';
+@import '../base/functions';
+
+
+
+// the :export directive is the magic sauce for webpack
+:export {
+  primary: map-get($theme-colors, 'primary');
+  secondary: map-get($theme-colors, 'secondary');
+  dark: map-get($theme-colors, 'dark');
+  light: map-get($theme-colors, 'light');
+  breakpointMobile: strip-unit(map-get($grid-breakpoints, 'lg'));
+  carouselLgWidth: map-get($carouselWidths, 'lg');
+  carouselXlWidth: map-get($carouselWidths, 'xl');
+  carouselSmWidth: map-get($carouselWidths, 'sm');
+}

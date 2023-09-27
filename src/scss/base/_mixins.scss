@@ -1,0 +1,300 @@
+@mixin media-breakpoint-custom-down($width) {
+  @media (max-width: ($width - 1) ) {
+    @content;
+  }
+}
+
+@mixin media-breakpoint-custom-up($width) {
+  @media (min-width: $width) {
+    @content;
+  }
+}
+
+@mixin media-breakpoint-custom-inbetweens($from, $to) {
+  @media (min-width: ($from) ) and (max-width: ($to - 1)) {
+    @content;
+  }
+}
+
+// Linear gradients
+@function is-direction($value) {
+  $is-keyword: index((to top, to top right, to right top, to right, to bottom right, to right bottom, to bottom, to bottom left, to left bottom, to left, to left top, to top left), $value);
+  $is-angle  : type-of($value)=='number'and index('deg' 'grad' 'turn' 'rad', unit($value));
+
+  @return $is-keyword or $is-angle;
+}
+
+@function legacy-direction($value) {
+  @if is-direction($value)==false {
+    @error "Cannot convert `#{$value}` to legacy syntax because it doesn't seem to be a direction.";
+  }
+
+  $conversion-map: (to top : bottom,
+    to top right : bottom left,
+    to right top : left bottom,
+    to right : left,
+    to bottom right : top left,
+    to right bottom : left top,
+    to bottom : top,
+    to bottom left : top right,
+    to left bottom : right top,
+    to left : right,
+    to left top : right bottom,
+    to top left : bottom right);
+
+  @if map-has-key($conversion-map, $value) {
+    @return map-get($conversion-map, $value);
+  }
+
+  @return 90deg - $value;
+}
+
+@mixin linear-gradient($direction, $color-stops...) {
+
+  // Direction has been omitted and happens to be a color-stop
+  @if is-direction($direction)==false {
+    $color-stops: $direction, $color-stops;
+    $direction  : 180deg;
+  }
+
+  //background: nth(nth($color-stops, 1), 1); 
+  background: -webkit-linear-gradient(legacy-direction($direction), $color-stops);
+  background: linear-gradient($direction, $color-stops);
+}
+
+@function calculaterem ($size, $font-size-relative) {
+  @return ($size / $font-size-relative)+rem;
+}
+
+// Place holders
+@mixin placeholder() {
+  &::-webkit-input-placeholder {
+    color: #fff;
+    @content
+  }
+
+  &:-moz-placeholder {
+    @content
+  }
+
+  &::-moz-placeholder {
+    @content
+  }
+
+  &:-ms-input-placeholder {
+    @content
+  }
+
+  &::placeholder {
+    @content;
+    opacity: 1;
+    /* Firefox */
+  }
+
+}
+
+// Container mixin 
+
+@mixin layout-container($smaller: false) {
+  @include media-breakpoint-custom-down($screen-hd) {
+    @if $smaller !='smaller' {
+      max-width: $container-max-width-laptops;
+    }
+
+  }
+
+
+  @include media-breakpoint-custom-down($screen-lg) {
+    padding-left : 60px;
+    padding-right: 60px;
+  }
+
+  @include media-breakpoint-custom-down($screen-sm) {
+    padding-left : 40px;
+    padding-right: 40px;
+  }
+
+  display     : block;
+  margin-left : auto;
+  margin-right: auto;
+  max-width   : $container-max-width;
+
+  @if $smaller=='smaller' {
+    max-width: $container-max-width-smaller;
+  }
+
+  padding-left : 60px;
+  padding-right: 60px;
+}
+
+
+// Fonts
+
+@mixin header-font() {
+  @include media-breakpoint-custom-down($screen-lg) {
+    font-size: 26px;
+  }
+
+  @include media-breakpoint-custom-down($screen-sm) {
+    font-size: 18px;
+  }
+
+  font-size  : 40px;
+  font-weight: 400;
+  line-height: 1.12;
+}
+
+@mixin featured-font() {
+  @include media-breakpoint-custom-down($screen-lg) {
+    font-size: 20px;
+  }
+
+  @include media-breakpoint-custom-down($screen-sm) {
+    font-size: 16px;
+  }
+
+  font-size  : 25px;
+  font-weight: 400;
+  line-height: 1.12;
+
+
+  p {
+    @include media-breakpoint-custom-down($screen-sm) {
+      margin-bottom: 10px;
+      margin-top   : 10px;
+    }
+
+    font-size  : inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+}
+
+@mixin body-font() {
+  @include media-breakpoint-custom-down($screen-lg) {
+    font-size: 18px;
+  }
+
+  @include media-breakpoint-custom-down($screen-sm) {
+    font-size: 14px;
+  }
+
+  font-size  : 20px;
+  font-weight: 400;
+  line-height: 1.12;
+
+
+  p {
+    @include media-breakpoint-custom-down($screen-sm) {
+      margin-bottom: 10px;
+      margin-top   : 15px;
+    }
+
+    font-size  : inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+
+}
+
+// Typstylings
+@mixin lead-headers($size: $font-size-root) {
+  text-transform: uppercase;
+  font-size     : $size;
+  letter-spacing: $letter-spacing-inc;
+  font-weight   : $font-weight-bold;
+  font-family   : $font-family-base;
+  line-height: $lead-line-height;
+}
+
+@mixin small-headers($size: $font-size-root) {
+  font-size     : $size;
+  letter-spacing: $letter-spacing-inc;
+  font-family   : $font-family-base;
+  line-height   : $line-height-sm;
+}
+
+@mixin small-headers-base($size: $font-size-root) {
+  text-transform: capitalize;
+  font-size     : $size;
+  letter-spacing: normal;
+  font-family   : $headings-font-family;
+}
+
+@mixin text-ellipsis() {
+  overflow     : hidden;
+  white-space  : nowrap;
+  text-overflow: ellipsis;
+}
+
+// gutter
+@mixin gutter-mobile() {
+  @include media-breakpoint-custom-down($screen-lg) {
+    padding-left : $grid-gutter-width-container-mobile/2;
+    padding-right: $grid-gutter-width-container-mobile/2;
+  }
+
+  @include media-breakpoint-custom-down($screen-xs) {
+    padding-left : $grid-gutter-width/2;
+    padding-right: $grid-gutter-width/2;
+  }
+
+}
+
+@mixin gutter-mask-mobile() {
+  @include media-breakpoint-custom-down($screen-lg) {
+    margin-left : ($grid-gutter-width-container-mobile/2)*-1;
+    margin-right: ($grid-gutter-width-container-mobile/2)*-1;
+  }
+
+  @include media-breakpoint-custom-down($screen-xs) {
+    margin-left : ($grid-gutter-width/2)*-1;
+    margin-right: ($grid-gutter-width/2)*-1;
+  }
+
+}
+
+// Horizontal scrollings
+@mixin hor-scroll() {
+  flex                      : 1;
+  display                   : block;
+  width                     : 100%;
+  overflow-x                : auto;
+  -webkit-overflow-scrolling: touch;
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width   : none;
+  /* Firefox */
+}
+
+// Buttonss
+@mixin theme-variant-btn($background,$color, $outlined:false) {
+  
+  @if ($outlined) {
+    border-color: currentColor;
+    color: $color;
+  } @else {
+    background-color: $background;
+    color: $color;
+    border-color: $background;
+  }
+}
+
+// Aspect ratio
+@mixin create-aspect-ratios() {
+  @each $aspect,
+  $ratio in $aspectRatios {
+    &--#{$aspect} {
+      &:before {
+        content: '';
+        padding-top: $ratio;
+      }
+    }
+  }
+}

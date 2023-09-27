@@ -1,0 +1,418 @@
+$image-path: '../assets/images';
+$font-path : '../assets/fonts';
+
+// Grid columns
+//
+// Set the number of columns and specify the width of the gutters.
+
+$grid-columns     : 12 !default;
+$grid-gutter-width: 30px !default;
+
+
+$grid-gutter-width-container-mobile: 60px;
+$grid-gutter-width-container-mids  : 160px;
+$grid-gutter-width-container-larger: 160px;
+$grid-gutter-width-cols            : 60px;
+$grid-gutter-width-cols-md         : 40px;
+$grid-gutter-width-cols-sm         : 10px;
+$grid-gutter-width-cols-mobile     : 15px;
+
+// Grid breakpoints
+//
+// Define the minimum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+$screen-xs   : 541px;
+$screen-sm   : 576px;
+$screen-md   : 992px;
+$screen-lg   : 1025px;
+$screen-xl   : 1280px;
+
+$grid-breakpoints: (xs: 0,
+        sm: $screen-sm,
+        md: $screen-md,
+        lg: $screen-lg,
+        xl: $screen-xl,
+        //hd: $screen-hd
+);
+
+$container-max-widths: (sm: 100%,
+        md: 720px,
+        lg: 960px,
+        xl: (1142px + $grid-gutter-width-container-larger),
+);
+
+$container-sm-max-width               : 1040px;
+$container-lg-max-width               : (1080px + $grid-gutter-width-container-larger);
+$container-fluid-restrict-max-width   : (1440px + $grid-gutter-width-container-larger);
+$container-fluid-restrict-max-width-lg: (1800px + $grid-gutter-width-container-larger);
+
+$mobile-breakpoint: 'md';
+
+//
+// Color system
+//
+
+// stylelint-disable
+$white   : #fff;
+$gray-100: #f6f6f7;
+$gray-200: #e2e0de;
+$gray-300: #dadada;
+$gray-400: #ced4da;
+$gray-500: #ededed;
+$gray-600: #5B829A;
+$gray-700: #5F5F5F;
+$gray-800: #27272C;
+$gray-900: #30383B;
+$black   : #000;
+
+$grays: () !default;
+$grays: map-merge(("100": $gray-100,
+                "200": $gray-200,
+                "300": $gray-300,
+                "400": $gray-400,
+                "500": $gray-500,
+                "600": $gray-600,
+                "700": $gray-700,
+                "800": $gray-800,
+                "900": $gray-900), $grays);
+
+$blue             : #00b4f3;
+$blue-dark        : #051A26;
+$blue-darker      : #091F2C;
+$blue-lighter     : #e9eef9;
+$blue-lighter-cyan: #01b2c6;
+$indigo           : #6610f2 !default;
+$purple           : #6f42c1 !default;
+$pink             : #af79d7;
+$red              : #E20714;
+$orange           : #ff8426;
+$yellow           : #fff100 !default;
+$green            : #15a8ba;
+$green-dark       : #8C8C8C;
+$teal             : #20c997 !default;
+$cyan             : #17a2b8 !default;
+$biege            : #f0edea;
+
+$colors: () !default;
+$colors: map-merge(("blue": $blue,
+                "blue-dark": $blue-dark,
+                "blue-lighter": $blue-lighter,
+                "blue-darker": $blue-darker,
+                "indigo": $indigo,
+                "purple": $purple,
+                "pink": $pink,
+                "red": $red,
+                "orange": $orange,
+                "yellow": $yellow,
+                "green": $green,
+                "green-dark": $green-dark,
+                "teal": $teal,
+                "cyan": $cyan,
+                "white": $white,
+                "gray-lighter": $gray-100,
+                "gray-light": $gray-300,
+                "gray": $gray-600,
+                "gray-dark": $gray-800,
+                "gray-darker": $gray-900), $colors);
+
+$primary        : $green-dark;
+$secondary      : $orange;
+$tertiary       : $pink;
+$accent         : $biege;
+$success        : $green !default;
+$info           : $cyan !default;
+$warning        : $yellow !default;
+$danger         : $red !default;
+$light          : $white;
+$dark           : $blue-darker;
+$seperator-color: $gray-300;
+$theme-colors   : () !default;
+$theme-colors   : map-merge(("primary": $primary,
+                "secondary": $secondary,
+                "accent": $accent,
+                "gray-lighter": $gray-100,
+                "gray-light": $gray-300,
+                "gray": $gray-600,
+                "gray-dark": $gray-700,
+                "gray-darker": $gray-900,
+                "success": $success,
+                "info": $info,
+                "warning": $warning,
+                "danger": $danger,
+                "error": $danger,
+                "active": $primary,
+                "light": $light,
+                "dark": $dark,
+                "cyan": $blue-lighter-cyan), $theme-colors);
+
+// Customize the light and dark text colors for use in our YIQ color contrast function.
+$yiq-text-dark : $dark;
+$yiq-text-light: $white;
+
+// Body
+//
+// Settings for the `<body>` element.
+
+$body-bg    : $light;
+$body-color : $dark;
+
+$body-bg    : var(--body-background);
+$body-color : var(--body-color);
+$theme-dark : var(--theme-dark);
+$theme-light: var(--theme-light);
+
+// Spacer
+$spacer      : 2rem;
+$spacer-limit: 8;
+$spacers     : ();
+$spacers     : map-merge((0: 0,
+                1: ($spacer * .25),
+                2: ($spacer * .5),
+                3: $spacer,
+                4: ($spacer * 1.5),
+                5: ($spacer * 3)), $spacers);
+
+// Fonts
+//
+// Font, line-height, and color for body text, headings, and more.
+
+// stylelint-disable value-keyword-case
+$font-family-parmigiano-regular : 'Parmigiano Sans Std Reg';
+$font-family-parmigiano-headline: 'Parmigiano Headline Std Reg';
+$font-family-monospace          : SFMono-Regular,
+Menlo,
+Monaco,
+Consolas,
+"Liberation Mono",
+"Courier New",
+monospace !default;
+
+$font-family-sans-serif: $font-family-parmigiano-regular,
+'sans';
+
+$icomoon           : 'icomoon';
+$icons-font-family : $icomoon;
+$font-family-base  : var(--base-font),
+$font-family-sans-serif;
+$headings-font-family : var(--header-font),
+$font-family-parmigiano-headline;
+$headings-font-family-secondary: var(--header-font-secondary),
+$headings-font-family;
+$logo-font-family               : $font-family-base;
+//$headings-font-family         : $font-family-aldus;
+$buttons-font-family            : $font-family-base;
+// stylelint-enable value-keyword-case
+$font-size-root                 : 15px;
+$font-size-root-xxl             : 15px;
+$font-size-root-xl              : 15px;
+$font-size-root-lg              : 15px;
+$font-size-root-md              : 15px;
+$font-size-root-xs              : 15px;
+$font-size-base                 : 1rem !default;
+$font-size-lg                   : (18px / $font-size-root) * 1rem;
+$font-size-md                   : (14px / $font-size-root) * 1rem;
+$font-size-sm                   : (12px / $font-size-root) * 1rem;
+$font-weight-extra-light        : 200;
+$font-weight-light              : 300;
+$font-weight-normal             : 400;
+$font-weight-medium             : 500;
+$font-weight-semi-bold          : 600;
+$font-weight-bold               : 700;
+$font-weight-extra-bold         : 800;
+$font-weight-base               : $font-weight-normal;
+$line-height-base               : 1.6666;
+$line-height-md                 : 1.5;
+$line-height-sm                 : 1.5;
+$headings-line-height           : 1.111;
+$headings-line-height-md        : 1.33333;
+$headings-line-height-sm        : 1.25;
+$lead-line-height               : 1.33333;
+$lead-line-height-sm            : 1.25;
+$headings-font-weight           : $font-weight-normal;
+$h1-font-size                   : (50px / $font-size-root) * 1rem;
+$h1-font-size-mobile            : (34px / $font-size-root-xs) * 1rem;
+$h2-font-size                   : (42px / $font-size-root) * 1rem;
+$h2-font-size-mobile            : (32px / $font-size-root-xs) * 1rem;
+$h3-font-size                   : (30px / $font-size-root) * 1rem;
+$h3-font-size-mobile            : (21px / $font-size-root-xs) * 1rem;
+$h4-font-size                   : (23px / $font-size-root) * 1rem;
+$h4-font-size-mobile            : (20px / $font-size-root-xs) * 1rem;
+$h5-font-size                   : (18px / $font-size-root) * 1rem;
+$h5-font-size-mobile            : (18px / $font-size-root-xs) * 1rem;
+$h6-font-size                   : $font-size-base !default;
+$h6-font-size-mobile            : $font-size-base;
+$lead-font-size                 : (24px / $font-size-root) * 1rem;
+$lead-font-size-mobile          : (20px / $font-size-root) * 1rem;
+$lead-font-weight               : $font-weight-normal;
+$custom-medium-font-size        : (22px / $font-size-root) * 1rem;
+$small-font-size                : (12px / $font-size-root) * 1rem;
+$letter-spacing-base            : 1px;
+$letter-spacing-inc             : 2px;
+$letter-spacing-dec             : .8px;
+$letter-spacing-headers         : 2px;
+$display1-size                  : (100px / $font-size-root) * 1rem;
+$display1-size-mobile           : (50px / $font-size-root) * 1rem;
+$display2-size                  : (52px / $font-size-root) * 1rem;
+$display3-size                  : (41px / $font-size-root) * 1rem;
+$display4-size                  : (28px / $font-size-root) * 1rem;
+$display1-weight                : 300 !default;
+$display2-weight                : 300 !default;
+$display3-weight                : 300 !default;
+$display4-weight                : 400 !default;
+$display-line-height            : $headings-line-height !default;
+
+$underline-offset: .3em;
+
+
+// Components
+//
+// components active
+$component-active-bg: $primary;
+$active-color: $gray-600;
+// Define common padding and border radius sizes and more.
+
+$line-height-lg: 1.5 !default;
+$line-height-sm: 1.5 !default;
+
+$border-width: 1px !default;
+$border-color: $gray-300 !default;
+
+$border-radius        : 0;
+$border-radius-lg     : 0;
+$border-radius-sm     : 0;
+$border-radius-rounded: 2rem;
+
+// Buttons + Forms
+//
+// Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
+
+$input-btn-padding-y  : (8px / $font-size-root) * 1rem;
+$input-btn-padding-x  : (18px / $font-size-root) * 1rem;
+$input-btn-line-height: 1.2;
+
+$input-btn-padding-y-sm  : (8px / $font-size-root) * 1rem;
+$input-btn-padding-x-sm  : (15px / $font-size-root) * 1rem;
+$input-btn-line-height-sm: 1;
+
+$input-btn-padding-y-lg  : (18px / $font-size-root) * 1rem;
+$input-btn-padding-x-lg  : (30px / $font-size-root) * 1rem;
+$input-btn-line-height-lg: 1;
+
+$input-btn-border-width: $border-width !default;
+$input-font-family     : $font-family-base;
+
+$input-placeholder-color: $body-color;
+$input-plaintext-color  : $body-color;
+
+$input-btn-focus-width           : .2rem;
+$input-btn-focus-color           : rgba($component-active-bg, .25);
+$input-btn-focus-box-shadow      : 0 0 0 $input-btn-focus-width $input-btn-focus-color;
+$input-btn-focus-box-shadow-inset: inset 0 0 0 $input-btn-focus-width $input-btn-focus-color;
+
+$input-color       : $body-color;
+$input-bg          : $body-bg;
+$input-border-color: $blue-dark;
+$input-color       : $gray-700;
+$input-border-width: $input-btn-border-width !default;
+$input-text-height : 60px;
+
+$label-color: $input-color;
+
+// Buttons
+//
+// For each of Bootstrap's buttons, define text, background, and border color.
+
+$btn-padding-y     : $input-btn-padding-y !default;
+$btn-padding-x     : $input-btn-padding-x !default;
+$btn-line-height   : $input-btn-line-height !default;
+$btn-padding-y-sm  : $input-btn-padding-y-sm !default;
+$btn-padding-x-sm  : $input-btn-padding-x-sm !default;
+$btn-line-height-sm: $input-btn-line-height-sm !default;
+$btn-padding-y-lg  : $input-btn-padding-y-lg !default;
+$btn-padding-x-lg  : $input-btn-padding-x-lg !default;
+$btn-line-height-lg: $input-btn-line-height-lg !default;
+$btn-border-width  : $input-btn-border-width !default;
+$btn-font-weight   : $font-weight-normal;
+$btn-box-shadow    : inset 0 1px 0 rgba($white, .15),
+0 1px 1px rgba($black, .075) !default;
+$btn-disabled-opacity   : .65 !default;
+$btn-active-box-shadow  : inset 0 3px 5px rgba($black, .125) !default;
+$btn-link-disabled-color: $gray-600 !default;
+$btn-block-spacing-y    : .5rem !default;
+// Allows for customizing button radius independently from global border radius
+$btn-border-radius      : $border-radius !default;
+$btn-border-radius-lg   : $border-radius-lg !default;
+$btn-border-radius-sm   : $border-radius-sm !default;
+$btn-font-size          : $font-size-md;
+
+// margin bottoms
+$headings-margin-bottom   : 1.8rem;
+$headings-margin-bottom-lg: 1.8rem;
+$paragraph-margin-bottom  : 1.8rem;
+$hr-margin-y              : .8rem;
+
+// shadows
+$elevate-1   : 0 0 2px 2px rgba($black, .075);
+$elevate-1-up: 0 -2px 2px 2px rgba($black, .075);
+
+$elevates: ('elevate-1': 0 5px 5px 2px rgba($black, .4));
+
+
+// Skew buttons
+$btn-skew-value  : 30deg;
+$btn-grad-color-1: $green-dark;
+$btn-grad-color-2: $green;
+
+$btn-grad-color-primary-dark: $blue-dark;
+$btn-grad-color-primary     : $blue;
+
+// Navigation
+$nav-font-size      : 1rem;
+$subnav-font-size   : 1rem;
+$header-layout-break: md;
+$header-transition  : ease .3s;
+
+// Zindexes
+$z-index-top-header                  : 999999;
+$z-index-top-header-mobile           : 999999;
+$z-index-splash-screen               : 99999;
+$z-index-top-sheets-mobile           : 99999;
+$z-index-top-sheets                  : 99999;
+$z-index-side-overlays               : 9999;
+$z-index-vertical-nav                : 999999;
+$z-index-backdrop                    : 9;
+$z-index-backdrop-bottom-sheet-mobile: 999999;
+$z-index-bottom-sheet-mobile         : 9999999;
+$z-index-high-priority               : 99999999;
+$z-index-higher-priority             : 999999999;
+
+// Variable carouselWidths in percent 
+$carouselWidths : ();
+$carouselWidths : map-merge((lg: 65,
+                xl: 80,
+                sm: 35), $carouselWidths);
+
+// Spinners
+$spinner-width : 20px;
+$spinner-height: 20px;
+
+$spinner-width-sm : 15px;
+$spinner-height-sm: 15px;
+
+$spinner-border-width   : 2px;
+$spinner-border-width-sm: 1px;
+
+// Aspect ratios custom
+@function aspect-ratio($w, $h) {
+        @return ($h / $w) * 100%;
+}
+
+$aspectRatios: () !default;
+$aspectRatios: map-merge(("4x3": aspect-ratio(4, 3),
+                "3x4": aspect-ratio(3, 4),
+                "5x3": aspect-ratio(5, 3),
+                "2x3": aspect-ratio(2, 3),
+                "3x2": aspect-ratio(3, 2),
+                "16x9": aspect-ratio(16, 9)
+        ), $aspectRatios
+);
