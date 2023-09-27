@@ -66,7 +66,6 @@ export const MapController = (() => {
             this.options.mapOptions.styles = styles
             this.initGoogleMap()
             const images = await this.loadOverlayImages()
-            this.updateGroundOverlay()
             this.mapLoading = false;
             this.updateHTML();
             this._addEventListeners()
@@ -113,6 +112,7 @@ export const MapController = (() => {
             const google = await this.Map.loadMap()
             this.Map.setMap(google, this.options.mapOptions)
             this.updateMarkers()
+            this.updateGroundOverlay()
         }
 
         //Markers
