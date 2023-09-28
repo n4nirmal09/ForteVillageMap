@@ -41,7 +41,7 @@ export const MapController = (() => {
                     disableDefaultUI: true,
                     styles: ''
                 },
-                stylesURL: GOOGLE_MAP_STYLE,
+                stylesURL: this.container.dataset.mapStyles || GOOGLE_MAP_STYLE,
                 classPrepend: 'interactive-map'
             },{
                 ...options
@@ -215,8 +215,19 @@ export const MapController = (() => {
         // Set ground overlays
         updateGroundOverlay() {
             if(!this.Map) return
-            const mainOverlay = this.groundOverlays[0]
+            const mainOverlay = this.mainOverlaySetter()
+            if(!mainOverlay) return
             this.Map.setGroundOverlay(mainOverlay.coordinates, mainOverlay.overlay)
+        }
+
+        mainOverlaySetter() {
+            const zoomLevel = this.Map.getMap().getZoom()
+            let mainOverlay = null
+            this.groundOverlays.forEach((overlaySet) => {
+                if(zoomLevel >= overlaySet.zoomLevel) mainOverlay = overlaySet
+            })
+
+            return mainOverlay
         }
 
         // Loaders
@@ -243,6 +254,13 @@ export const MapController = (() => {
             if (!this.spotsDetailModalActive) this.showModal(true)
         }
 
+        onMapZoom(e) {
+            const map = e.detail.getMap()
+            const zoomLevel = map.getZoom()
+
+            this.updateGroundOverlay()
+        }
+
         // Resize Func
         _responsiveFunc() {
             return utilities.debounce(() => {
@@ -254,6 +272,7 @@ export const MapController = (() => {
         _addEventListeners() {
             this.container.addEventListener("markerClick", (e) => this.onMarkerClick(e))
             this.spotDetailClose.addEventListener("click", () => this.spotsDetailModalActive && this.showModal(false))
+            this.container.addEventListener("mapZoomed", (e) => this.onMapZoom(e))
 
             window.addEventListener('resize', this._responsiveFunc())
         }

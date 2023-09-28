@@ -42,6 +42,7 @@ export default class GMap {
     }
 
     init() {
+        
         //this.initGoogleMap()
         this.mapEventsCreator()
     }
@@ -69,6 +70,7 @@ export default class GMap {
         this.Map = null
         const mapOptions = Object.assign(this.setupOptions, options)
         this.Map = new google.maps.Map(this.$map, mapOptions)
+        this._addListeners()
     }
 
     setMapCenter(loc) {
@@ -110,8 +112,8 @@ export default class GMap {
             }
         })
         marker.setMap(this.Map)
+        marker.addListener("click", () => this.markerClick(marker))
         this.markers.push(marker)
-        this.addMarkerListener()
         return marker
 
     }
@@ -126,6 +128,7 @@ export default class GMap {
 
     // GroundOverlays
     setGroundOverlay(coords, OverlayImg) {
+        this.removeGroundOverlays()
         const imageBounds = new google.maps.LatLngBounds(
             new google.maps.LatLng(coords.S, coords.W),//South West coordinates
             new google.maps.LatLng(coords.N, coords.E)); //North east coordinates
@@ -155,6 +158,13 @@ export default class GMap {
             }
         })
 
+        this.events['mapZoomed'] = new CustomEvent('mapZoomed', {
+            bubbles: true,
+            detail: {
+                getMap: () => this.Map
+            }
+        })
+
     }
 
     // Event handlers
@@ -175,13 +185,17 @@ export default class GMap {
         this.$map.dispatchEvent(this.events['markerClick'])
     }
 
+    onMapZoom() {
+        this.$map.dispatchEvent(this.events['mapZoomed'])
+    }
+
     // Marker Utilities
     selectMarker(marker) {
         new google.maps.event.trigger(marker, 'click')
     }
 
     // Listeners
-    addMarkerListener() {
-        this.markers.forEach((marker) => marker.addListener("click", () => this.markerClick(marker)))
+    _addListeners() {
+        this.Map.addListener("zoom_changed", () => this.onMapZoom())
     }
 }
