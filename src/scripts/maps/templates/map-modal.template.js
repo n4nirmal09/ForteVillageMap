@@ -1,9 +1,9 @@
-export default ({local={}, mainClass='modal'}) => {
+export default ({locale={}, mainClass='modal'}) => {
     return `<div class="${mainClass}">
                 <div class="${mainClass}__header">
                     <h4 class="${mainClass}__header-title"></h4>
                     <span class="${mainClass}__header-close btn btn-outline-gray-light" >
-                        close
+                        ${locale["Close"] || 'Close'} 
                     </span>
                 </div>
                 <div class="${mainClass}__body">
@@ -13,6 +13,6 @@ export default ({local={}, mainClass='modal'}) => {
                     </div>
                     <div class="${mainClass}__featured-image bg-img aspect-ratio--4x3"></div>
                 </div>
-                <div class="${mainClass}__action"><a class="${mainClass}__link btn btn-outline-gray-light btn-box" href="#">${ local.goToWebsiteBtn || 'Go to website'}</a></div>
+                <div class="${mainClass}__action"><a class="${mainClass}__link btn btn-outline-gray-light btn-box" href="#">${ locale["Go to"] || 'Go to website'}</a></div>
             </div>`
 }

@@ -7,10 +7,22 @@
         "image": "https://via.placeholder.com/722x542",
         "type": "hotel",
         "link": "null",
+        "icon": "./images/icon-custom.png",
+        "label": "Fortevillage hotel castello",
         "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
     },
     {
         "name": "Forte Village Resort - Hotel Pineta",
+        "label": {
+            "text": "Custom label",
+            "fontFamily": "sans-serif",
+            "fontSize": "50px",
+            "color": "red"
+        },
+        "icon": {
+            "fillColor": "#000",
+            "fillOpacity": 0
+        },
         "latitude": 38.93420641442168,
         "longitude": 8.930143062240633,
         "image": "https://via.placeholder.com/722x542",

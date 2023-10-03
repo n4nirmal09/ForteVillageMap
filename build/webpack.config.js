@@ -82,9 +82,9 @@ module.exports = env => {
         output: {
             path: config.build.assetsRoot,
             publicPath: env.production ? config.build.assetsPublicPath : config.dev.assetsPublicPath,
-            filename: 'js/[name].[contenthash].bundle.js',
+            filename: 'js/[name].gmap.[contenthash].bundle.js',
             chunkFilename: (pathData) => {
-                return 'js/[name].[contenthash].min.js';
+                return 'js/[name].gmap.[contenthash].min.js';
             }
         },
         devServer: {
@@ -214,7 +214,7 @@ module.exports = env => {
                     vendors: false,
                     // vendor chunk
                     vendor: {
-                        filename: 'js/vendor.[contenthash].bundle.js',
+                        filename: 'js/vendor.gmap.[contenthash].bundle.js',
                         // sync + async chunks
                         chunks: 'all',
                         // import file path containing node_modules
@@ -254,9 +254,9 @@ module.exports = env => {
                 ],
             }),
             new MiniCssExtractPlugin({
-                filename: 'css/[name].[contenthash].bundle.css',
+                filename: 'css/[name].gmap.[contenthash].bundle.css',
                 chunkFilename: (module) => {
-                    return module.chunk.name.match(/(darkTheme|daterangepicker|exports|main)/g) ? 'css/[name].[contenthash].css' : 'css/utilities.[contenthash].css'
+                    return module.chunk.name.match(/(darkTheme|daterangepicker|exports|main)/g) ? 'css/[name].gmap.[contenthash].css' : 'css/utilities.gmap.[contenthash].css'
                 },
             }),
 

@@ -3,7 +3,7 @@ import {
 } from "@/scripts/config/api.config"
 
 
-export const API = (($) => {
+export const API = (() => {
     class Controller {
         constructor(options) {
             this.options = Object.assign(defaultApiOptions, this.options)
@@ -12,7 +12,6 @@ export const API = (($) => {
         }
 
         init() {
-            this.setupAjaxBase()
         }
 
         setupAjaxBase() {
@@ -79,4 +78,4 @@ export const API = (($) => {
     return {
         Controller
     }
-})(jQuery)
+})()

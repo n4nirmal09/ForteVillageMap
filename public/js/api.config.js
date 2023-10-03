@@ -1,8 +1,0 @@
-window.BASE_URL = ""
-window.HOTEL_GET_URL = ""
-window.BOOK_A_STAY_URL = "https://be.synxis.com/?chain=18067"
-window.BOOK_A_STAY_HOTEL_SELECT_URL = "https://my-json-server.typicode.com/n4nirmal09/RoccoDemoApi/stay/synxisHotel"
-window.MEALS_URL = "https://my-json-server.typicode.com/n4nirmal09/RoccoDemoApi/getRestuarant/"
-window.MEALS_TIMESLOT_URL = "https://my-json-server.typicode.com/n4nirmal09/RoccoDemoApi/timeSlots/"
-window.MEALS_BOOKING_URL = "https://my-json-server.typicode.com/n4nirmal09/RoccoDemoApi/booking/"
-window.MEALS_PERSONAL_DETAILS = "https://my-json-server.typicode.com/n4nirmal09/RoccoDemoApi/personalDetails/"

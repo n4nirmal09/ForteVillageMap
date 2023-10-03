@@ -24,6 +24,12 @@ export const MapController = (() => {
             this.markersLoading = false
             this.markersFilter = ['all']
             this.modal = false
+            this.inlineMapOptions = this.APIServices.isJson(this.container.dataset.mapOptions) ? JSON.parse(this.container.dataset.mapOptions) : {}
+            this.locale = this.APIServices.isJson(this.container.dataset.locale)  ? JSON.parse(this.container.dataset.locale) : {
+                "Go to": "Go to",
+                "Close": "Close",
+            }
+            console.log(this.inlineMapOptions)
             this.options = Object.assign({
                 mapOptions: {
                     restriction: {
@@ -39,7 +45,8 @@ export const MapController = (() => {
                     center: { lat: 38.932583, lng: 8.932833 },
                     minZoom: 18,
                     disableDefaultUI: true,
-                    styles: ''
+                    styles: '',
+                    ...this.inlineMapOptions
                 },
                 stylesURL: this.container.dataset.mapStyles || GOOGLE_MAP_STYLE,
                 classPrepend: 'interactive-map'
@@ -88,7 +95,8 @@ export const MapController = (() => {
         createSpotDetailsModal() {
             if(this.spotDetailsModal) this.spotDetailsModal.remove()
             this.spotDetailsModal  = utilities.createNodeParsing(modalTpl({
-                mainClass: `${this.options.classPrepend}-modal`
+                mainClass: `${this.options.classPrepend}-modal`,
+                locale: this.locale
             }))
             this.spotDetailClose = this.spotDetailsModal.querySelector(`.${this.options.classPrepend}-modal__header-close`)
             this.container.appendChild(this.spotDetailsModal)
@@ -158,23 +166,23 @@ export const MapController = (() => {
             const detail = this.spotDetailsModal.querySelector(`.${this.options.classPrepend}-modal__detail`)
             // const $body = this.spotDetailsModal.querySelector(`.${this.options.classPrepend}-modal__body`)
             const description = this.spotDetailsModal.querySelector(`.${this.options.classPrepend}-modal__description`)
-            // const $link = this.spotDetailsModal.querySelector(`.${this.options.classPrepend}-modal__link`)
+            const $link = this.spotDetailsModal.querySelector(`.${this.options.classPrepend}-modal__link`)
 
             // $title.innerHTML = spot.name || ''
             headerTitle.innerHTML = spot.name || ''
             detail.innerHTML = spot.details || ''
             description.innerHTML = spot.description || ''
-            // function isEmptyOrSpaces(str) {
-            //     return str === null || str.match(/^ *$/) !== null || str === "null" || str === "Null";
-            // }
-            // if (!isEmptyOrSpaces(`${spot.link}`)) {
-            //     $link.style.display = "inline-flex";
-
-            //     $link.setAttribute('href', `${spot.link}`)
-            // }
-            // else {
-            //     $link.style.display = "none";
-            // }
+            function isEmptyOrSpaces(str) {
+                return str === null || str.match(/^ *$/) !== null || str === "null" || str === "Null";
+            }
+            if (!isEmptyOrSpaces(`${spot.link}`)) {
+                $link.style.display = "inline-flex";
+                $link.setAttribute('href', `${spot.link}`)
+                $link.innerHTML = spot.linkTitle ?  `${spot.linkTitle}` : this.locale["Go to"]
+            }
+            else {
+                $link.style.display = "none";
+            }
             // // $link.setAttribute('href', `${spot.link}`)
             this.featuredImage()
         }
@@ -191,6 +199,11 @@ export const MapController = (() => {
         async featuredImage($imagePanel, src) {
             const $image = $imagePanel || this.spotDetailsModal.querySelector(`.${this.options.classPrepend}-modal__featured-image`)
             const imgSrc = src || this.activeSpot["image"]
+            $image.classList.remove('d-none')
+            if(!imgSrc) {
+                $image.classList.add('d-none')
+                return
+            }
             $image.classList.remove(`bg-img--loaded`)
             $image.classList.add(`bg-img--preload-small`)
             let imageLoaded = ''

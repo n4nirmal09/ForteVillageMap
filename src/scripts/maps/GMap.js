@@ -98,15 +98,23 @@ export default class GMap {
         return this.markers
     }
 
+    iconMaker(icon, defaultIcon) {
+        if (typeof icon === "string") return icon
+        return {...defaultIcon, ...icon}
+    }
+
     addMarker(loc, details) {
         const locString = loc.trim().split(" ")
         const lat = locString[0]
         const long = locString[1]
+        const icon = this.iconMaker(details.icon, this.svgMarker)
+        const label = details.label || null
+
 
         const marker = new google.maps.Marker({
             position: new google.maps.LatLng(lat, long),
-            //label: labels[labelIndex++ % labels.length],
-            icon: details.pin || this.svgMarker,
+            label: label,
+            icon: icon,
             details: {
                 ...details
             }
@@ -173,10 +181,11 @@ export default class GMap {
         if (this.selectedMarker === marker) return
         this.selectedMarker = marker
         this.markers.forEach((marker) => {
-            marker.setIcon(marker.details.pin || this.svgMarker)
+            const icon = this.iconMaker(marker.details.icon, this.svgMarker)
+            marker.setIcon(icon)
             marker.setZIndex(1)
         })
-        this.selectedMarker.setIcon(this.selectedMarker.details.pin || this.svgMarkerActive)
+        this.selectedMarker.setIcon(this.iconMaker(marker.details.icon, this.svgMarkerActive))
         this.selectedMarker.setZIndex(2)
     }
 
