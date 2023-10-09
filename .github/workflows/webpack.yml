@@ -25,4 +25,13 @@ jobs:
     - name: Build
       run: |
         npm install
-        npm build
+        npm run build
+
+    - name: Zip artifact for deployment
+      run: zip release.zip ./dist -r
+    
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v2
+      with:
+        name: ForteMap
+        path: release.zip
