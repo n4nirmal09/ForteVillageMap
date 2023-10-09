@@ -23,6 +23,7 @@ export const MapController = (() => {
             this.markers = this.container.dataset.markers || []
             this.markersLoading = false
             this.markersFilter = ['all']
+            this.markersFilterElement = document.querySelector(this.container.dataset.filterLink)
             this.modal = false
             this.inlineMapOptions = this.APIServices.isJson(this.container.dataset.mapOptions) ? JSON.parse(this.container.dataset.mapOptions) : {}
             this.locale = this.APIServices.isJson(this.container.dataset.locale)  ? JSON.parse(this.container.dataset.locale) : {
@@ -68,6 +69,7 @@ export const MapController = (() => {
             this.mapLoading = true;
             this.createHTML();
             this.updateHTML();
+            this.updateFilterOptions()
             const styles = await this.fetchGMapStyles()
             await this.fetchMarkers()
             this.options.mapOptions.styles = styles
@@ -151,6 +153,21 @@ export const MapController = (() => {
             })
         }
 
+        // Update filter options
+        updateFilterOptions() {
+            if(!this.markersFilterElement) {
+                this.markersFilter = ['all']
+                return
+            }
+            const inputs = this.markersFilterElement?.querySelectorAll('.map-filter__item-input')
+            const checkedValues = []
+            inputs.forEach((input) => {
+                if(input.checked) checkedValues.push(input.value)
+            })
+
+            this.markersFilter = checkedValues
+        }
+
         // Modal detail functions
         showModal(show) {
             this.spotsDetailModalActive = show
@@ -225,6 +242,8 @@ export const MapController = (() => {
             this.updateModal()
         }
 
+        
+
         // Set ground overlays
         updateGroundOverlay() {
             if(!this.Map) return
@@ -248,9 +267,11 @@ export const MapController = (() => {
             let mainLoader = this.container.querySelector(`.${this.options.classPrepend}__loader`)
             if(mainLoader) mainLoader.remove()
             this.container.classList.remove(`${this.options.classPrepend}--loading`)
+            this.markersFilterElement?.classList.remove(`loading-map`)
             if(!this.mapLoading)  return
 
             this.container.classList.add(`${this.options.classPrepend}--loading`)
+            this.markersFilterElement?.classList.add(`loading-map`)
             mainLoader = document.createElement('div');
             mainLoader.classList.add(`${this.options.classPrepend}__loader`)
             mainLoader.innerHTML = `<span class="spinner"><span class="spinner-border"><span class="sr-only">loading ...</span></span></span>`
@@ -274,6 +295,11 @@ export const MapController = (() => {
             this.updateGroundOverlay()
         }
 
+        onFilterChange(e) {
+            this.updateFilterOptions()
+            this.updateMarkers()
+        }
+
         // Resize Func
         _responsiveFunc() {
             return utilities.debounce(() => {
@@ -286,6 +312,12 @@ export const MapController = (() => {
             this.container.addEventListener("markerClick", (e) => this.onMarkerClick(e))
             this.spotDetailClose.addEventListener("click", () => this.spotsDetailModalActive && this.showModal(false))
             this.container.addEventListener("mapZoomed", (e) => this.onMapZoom(e))
+
+            const filterInputs = this.markersFilterElement?.querySelectorAll('.map-filter__item-input')
+            console.log(filterInputs)
+            filterInputs.forEach((input) => {
+                input.addEventListener('change', (e) => this.onFilterChange(e))
+            })
 
             window.addEventListener('resize', this._responsiveFunc())
         }

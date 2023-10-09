@@ -91,3 +91,10 @@ $modal-content-padding: 15px;
     }
 
 }
+
+.map-filter {
+    &.loading-map {
+        opacity: 0.5;
+        pointer-events: none!important;
+    }
+}

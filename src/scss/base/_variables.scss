@@ -10,7 +10,7 @@ $grid-gutter-width: 30px !default;
 
 
 $grid-gutter-width-container-mobile: 60px;
-$grid-gutter-width-container-mids  : 160px;
+$grid-gutter-width-container-mids  : 40px;
 $grid-gutter-width-container-larger: 160px;
 $grid-gutter-width-cols            : 60px;
 $grid-gutter-width-cols-md         : 40px;
@@ -42,7 +42,7 @@ $container-max-widths: (sm: 100%,
 );
 
 $container-sm-max-width               : 1040px;
-$container-lg-max-width               : (1080px + $grid-gutter-width-container-larger);
+$container-lg-max-width               : (1140px + $grid-gutter-width-container-mids);
 $container-fluid-restrict-max-width   : (1440px + $grid-gutter-width-container-larger);
 $container-fluid-restrict-max-width-lg: (1800px + $grid-gutter-width-container-larger);
 

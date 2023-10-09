@@ -160,7 +160,7 @@ module.exports = env => {
                 }]
             },
             {
-                test: /\.(png|jpe?g|gif|ico|svg)(\?.*)?$/,
+                test: /\.(png|jpe?g|gif|ico|svg|webp)(\?.*)?$/,
                 loader: 'url-loader',
                 include: path.resolve(__dirname, '../src/assets/images'),
                 options: {

@@ -3,16 +3,30 @@ block header
   header Header
 block content
   div.container
+    .map-filter#forte-map-filter
+      ul.map-filter__list.list-unstyled.list-row
+        each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}]
+          li.map-filter__item.list-col
+            input.map-filter__item-input(type="checkbox", name="map-filter", value=i.value, checked = i.selected) 
+            label.map-filter__item-label !{i.name}
+    //- .map-filter#forte-map-filter-radio
+    //-   ul.map-filter__list
+    //-     each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}]
+    //-       li.map-filter__item 
+    //-         input.map-filter__item-input(type="radio", name="map-filter", value=i.value, checked = i.selected) 
+    //-         label.map-filter__item-label !{i.name}
+
     .aspect-ratio--16x9 
       .aspect-ratio__inner-content 
         div.forte-map.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/hotspots.json", 
         data-ground-overlays=[{"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
-        "zoomLevel": 18,
-        "overlay": require("@images/mappaconverde.jpg").default},
+        "zoomLevel": 17,
+        "overlay": require("@images/HighRes.webp").default},
       ], data-map-options={
-        zoom: 18,
+        zoom: 17,
         center: { lat: 38.932583, lng: 8.932833 },
-        minZoom: 18,
+        minZoom: 17,
+        maxZoom: 19,
         restriction: {
           latLngBounds: {
             north: 38.94287213966831,
@@ -24,7 +38,10 @@ block content
         },
         disableDefaultUI: true,
         zoomControl: true
-      }, data-locale={"Go to": "vai al sito", "Close" : "vicino"})
+      }, 
+      data-locale={"Go to": "vai al sito", "Close" : "vicino"},
+      data-filter-link="#forte-map-filter"
+      )
 
 
 block footer
