@@ -12,7 +12,6 @@ export default class GMap {
             center: { lat: 38.932583, lng: 8.932833 },
             zoom: 7,
             styles: mapStyles,
-            disableDefaultUI: false,
         }
 
         this.svgMarker = {

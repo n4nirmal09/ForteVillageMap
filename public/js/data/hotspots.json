@@ -4,7 +4,7 @@
         "latitude": 38.93250388766362,
         "longitude": 8.931741658759142,
         "details": "700m from hotel",
-        "image": "https://via.placeholder.com/722x542",
+        "image": null,
         "type": "hotel",
         "link": "null",
         "icon": "./images/icon-custom.png",
@@ -38,7 +38,7 @@
         "image": "https://via.placeholder.com/722x542",
         "details": "700m from hotel",
         "type": "villa",
-        "link": "#",
+        "link": "/fortevillage.com",
         "description": "Veniam dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
     }
 ]

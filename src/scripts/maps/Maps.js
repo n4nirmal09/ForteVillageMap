@@ -29,7 +29,6 @@ export const MapController = (() => {
                 "Go to": "Go to",
                 "Close": "Close",
             }
-            console.log(this.inlineMapOptions)
             this.options = Object.assign({
                 mapOptions: {
                     restriction: {
@@ -45,6 +44,7 @@ export const MapController = (() => {
                     center: { lat: 38.932583, lng: 8.932833 },
                     minZoom: 18,
                     disableDefaultUI: true,
+                    zoomControl: true,
                     styles: '',
                     ...this.inlineMapOptions
                 },
