@@ -148,35 +148,45 @@ export const MapController = (() => {
             if(!this.Map) return
             const hotSpots = this.markers
             this.Map.removeAllMarkers()
-            const filteredMarkers = hotSpots.filter((spot) => (this.markersFilter.findIndex((markerType) => markerType === spot.type || markerType === 'all') !== -1 ))
-            filteredMarkers.forEach(spot => {
+            const filteredMarkers = hotSpots.filter((spot) => (this.markersFilter.findIndex((markerType) => markerType === spot.type || markerType === 'all') !== -1 )).map((marker, markerIndex) => {
+                return {
+                    ...marker,
+                    markerIndex
+                }
+            })
+            filteredMarkers.forEach((spot, markerIndex) => {
                 this.Map.addMarker(`${spot.latitude} ${spot.longitude}`, {
                     ...spot
                 })
             })
-            if(this.options.appendLegendsTo) this.updateLegends(filteredMarkers)
+            if(this.options.appendLegendsTo) this.createLegends(filteredMarkers)
         }
 
-        updateLegends(legends) {
+        createLegends(legends) {
             
             if(!this.options.appendLegendsTo) return
             this.options.appendLegendsTo.innerHTML = ``
             const legendList = document.createElement('ul')
             legendList.classList.add('legends-list')
 
-            legends.forEach((legend, i) => {
-                legendList.appendChild(this.createLegend(legend, i))
+            legends.forEach((legend) => {
+                legendList.appendChild(this.createLegend({
+                    ...legend
+                }))
             })
 
             this.options.appendLegendsTo.appendChild(legendList)
             
         }
 
-        createLegend(legend, index) {
+        createLegend(legend) {
             const legendItem = document.createElement('li')
             legendItem.classList.add('legends-list__item')
             legendItem.innerHTML= `<span class="legends-list__name">${legend.name}</span>`
-            legendItem.addEventListener('click', () => this.Map.selectMarker(index))
+            legendItem.addEventListener('click', () => {
+                console.log(legend.markerIndex)
+                this.Map.selectMarker(legend.markerIndex)
+            })
             return legendItem
         }
 
@@ -245,6 +255,7 @@ export const MapController = (() => {
             const imgSrc = src || this.activeSpot["image"]
             $image.classList.remove('d-none')
             if(!imgSrc) {
+                
                 $image.classList.add('d-none')
                 return
             }
