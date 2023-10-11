@@ -104,8 +104,11 @@ export default class GMap {
 
     addMarker(loc, details) {
         const locString = loc.trim().split(" ")
-        const lat = locString[0]
-        const long = locString[1]
+        const x = details.x || 0
+        const y = details.y || 0
+        const offsetUnit = details.offsetUnit || 100000
+        const lat = parseFloat(locString[0]) + (x * 1/offsetUnit)
+        const long = parseFloat(locString[1]) + (y * 1/offsetUnit)
         const icon = this.iconMaker(details.icon, this.svgMarker)
         const label = details.label || null
 
@@ -184,11 +187,18 @@ export default class GMap {
             marker.setIcon(icon)
             marker.setZIndex(1)
         })
-        this.selectedMarker.setIcon(this.iconMaker(marker.details.icon, this.svgMarkerActive))
+        this.selectedMarker.setIcon(this.iconMaker(marker.details.iconActive || marker.details.icon, this.svgMarkerActive))
         this.selectedMarker.setZIndex(2)
     }
 
+    
+
     markerClick(marker) {
+        if(typeof marker === "number") {
+            this.toggleMarkerActive(this.markers[marker])
+            this.$map.dispatchEvent(this.events['markerClick']) 
+            return
+        }
         this.toggleMarkerActive(marker)
         this.$map.dispatchEvent(this.events['markerClick'])
     }
@@ -199,6 +209,10 @@ export default class GMap {
 
     // Marker Utilities
     selectMarker(marker) {
+        if(typeof marker === "number") {
+            new google.maps.event.trigger(this.markers[marker], 'click')
+            return
+        }
         new google.maps.event.trigger(marker, 'click')
     }
 

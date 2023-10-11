@@ -23,13 +23,13 @@ export const MapController = (() => {
             this.markers = this.container.dataset.markers || []
             this.markersLoading = false
             this.markersFilter = ['all']
-            this.markersFilterElement = document.querySelector(this.container.dataset.filterLink)
             this.modal = false
             this.inlineMapOptions = this.APIServices.isJson(this.container.dataset.mapOptions) ? JSON.parse(this.container.dataset.mapOptions) : {}
             this.locale = this.APIServices.isJson(this.container.dataset.locale)  ? JSON.parse(this.container.dataset.locale) : {
                 "Go to": "Go to",
                 "Close": "Close",
             }
+            
             this.options = Object.assign({
                 mapOptions: {
                     restriction: {
@@ -50,7 +50,9 @@ export const MapController = (() => {
                     ...this.inlineMapOptions
                 },
                 stylesURL: this.container.dataset.mapStyles || GOOGLE_MAP_STYLE,
-                classPrepend: 'interactive-map'
+                classPrepend: 'interactive-map',
+                markersFilterElement: document.querySelector(this.container.dataset.filterLink),
+                appendLegendsTo: this.container.dataset.appendLegendsTo ? document.querySelector(this.container.dataset.appendLegendsTo) : null
             },{
                 ...options
             })
@@ -121,6 +123,7 @@ export const MapController = (() => {
             this.Map = new GMap(this.mapCanvas, this.googleMapLoaderOptions)
             const google = await this.Map.loadMap()
             this.Map.setMap(google, this.options.mapOptions)
+            
             this.updateMarkers()
             this.updateGroundOverlay()
         }
@@ -145,21 +148,45 @@ export const MapController = (() => {
             if(!this.Map) return
             const hotSpots = this.markers
             this.Map.removeAllMarkers()
-            hotSpots.forEach(spot => {
-                if( (this.markersFilter.findIndex((markerType) => markerType === spot.type || markerType === 'all') !== -1 ) )
-                    this.Map.addMarker(`${spot.latitude} ${spot.longitude}`, {
-                        ...spot
-                    })
+            const filteredMarkers = hotSpots.filter((spot) => (this.markersFilter.findIndex((markerType) => markerType === spot.type || markerType === 'all') !== -1 ))
+            filteredMarkers.forEach(spot => {
+                this.Map.addMarker(`${spot.latitude} ${spot.longitude}`, {
+                    ...spot
+                })
             })
+            if(this.options.appendLegendsTo) this.updateLegends(filteredMarkers)
+        }
+
+        updateLegends(legends) {
+            
+            if(!this.options.appendLegendsTo) return
+            this.options.appendLegendsTo.innerHTML = ``
+            const legendList = document.createElement('ul')
+            legendList.classList.add('legends-list')
+
+            legends.forEach((legend, i) => {
+                legendList.appendChild(this.createLegend(legend, i))
+            })
+
+            this.options.appendLegendsTo.appendChild(legendList)
+            
+        }
+
+        createLegend(legend, index) {
+            const legendItem = document.createElement('li')
+            legendItem.classList.add('legends-list__item')
+            legendItem.innerHTML= `<span class="legends-list__name">${legend.name}</span>`
+            legendItem.addEventListener('click', () => this.Map.selectMarker(index))
+            return legendItem
         }
 
         // Update filter options
         updateFilterOptions() {
-            if(!this.markersFilterElement) {
+            if(!this.options.markersFilterElement) {
                 this.markersFilter = ['all']
                 return
             }
-            const inputs = this.markersFilterElement?.querySelectorAll('.map-filter__item-input')
+            const inputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input')
             const checkedValues = []
             inputs.forEach((input) => {
                 if(input.checked) checkedValues.push(input.value)
@@ -267,11 +294,11 @@ export const MapController = (() => {
             let mainLoader = this.container.querySelector(`.${this.options.classPrepend}__loader`)
             if(mainLoader) mainLoader.remove()
             this.container.classList.remove(`${this.options.classPrepend}--loading`)
-            this.markersFilterElement?.classList.remove(`loading-map`)
+            this.options.markersFilterElement?.classList.remove(`loading-map`)
             if(!this.mapLoading)  return
 
             this.container.classList.add(`${this.options.classPrepend}--loading`)
-            this.markersFilterElement?.classList.add(`loading-map`)
+            this.options.markersFilterElement?.classList.add(`loading-map`)
             mainLoader = document.createElement('div');
             mainLoader.classList.add(`${this.options.classPrepend}__loader`)
             mainLoader.innerHTML = `<span class="spinner"><span class="spinner-border"><span class="sr-only">loading ...</span></span></span>`
@@ -313,8 +340,7 @@ export const MapController = (() => {
             this.spotDetailClose.addEventListener("click", () => this.spotsDetailModalActive && this.showModal(false))
             this.container.addEventListener("mapZoomed", (e) => this.onMapZoom(e))
 
-            const filterInputs = this.markersFilterElement?.querySelectorAll('.map-filter__item-input')
-            console.log(filterInputs)
+            const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input')
             filterInputs.forEach((input) => {
                 input.addEventListener('change', (e) => this.onFilterChange(e))
             })

@@ -20,12 +20,12 @@ block content
       .aspect-ratio__inner-content 
         div.forte-map.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/hotspots.json", 
         data-ground-overlays=[{"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
-        "zoomLevel": 17,
-        "overlay": require("@images/HighRes.webp").default},
+        "zoomLevel": 16,
+        "overlay": require("@images/TestMapNewOpacity.png").default},
       ], data-map-options={
-        zoom: 17,
+        zoom: 16,
         center: { lat: 38.932583, lng: 8.932833 },
-        minZoom: 17,
+        minZoom: 16,
         maxZoom: 19,
         restriction: {
           latLngBounds: {
@@ -41,8 +41,9 @@ block content
       }, 
       data-locale={"Go to": "vai al sito", "Close" : "vicino"},
       data-filter-link="#forte-map-filter"
+      data-append-legends-to="#forte-map-legends"
       )
-
+    #forte-map-legends
 
 block footer
   footer footer
