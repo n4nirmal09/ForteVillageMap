@@ -339,7 +339,7 @@ export const MapController = (() => {
             this.activeSpot = value
             this.Map.mapPanTo(marker)
             this.updateHTML()
-            if (!this.spotsDetailModalActive) this.showModal(true)
+            //if (!this.spotsDetailModalActive) this.showModal(true)
         }
 
         onMapZoom(e) {

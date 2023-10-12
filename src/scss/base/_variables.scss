@@ -416,3 +416,25 @@ $aspectRatios: map-merge(("4x3": aspect-ratio(4, 3),
                 "16x9": aspect-ratio(16, 9)
         ), $aspectRatios
 );
+
+$highlight-active-color: $primary;
+$highlight-hover-color: fade-out($primary, 0.8);
+
+$input-file-upload-border-color : $secondary;
+$input-file-upload-border-offset: 5px;
+$input-file-upload-background   : transparent;
+
+$input-switch-rail-bg           : #ccd2de;
+$input-switch-button-active-bg  : $highlight-active-color;
+$input-switch-button-inactive-bg: $white;
+
+$form-select-indicator: fade-out($primary, 0.8);
+
+
+$card-border-color : transparent;
+$card-border-radius: $border-radius-lg;
+$card-inner-padding: (15px/$font-size-root) * 1rem;
+
+$card-spacer-x-lg: (24px / $font-size-root) * 1rem;
+
+$card-bg: $white;

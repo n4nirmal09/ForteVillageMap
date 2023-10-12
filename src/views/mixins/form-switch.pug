@@ -1,0 +1,9 @@
+mixin form-switch(options={})
+    .form-switch(class=options.modifiers)
+        input.form-switch__input(type=options.type, checked=options.checked, name=options.name, id=options.id, value=options.value)
+        label.form-switch__label(for=options.id)
+            if options.title 
+                div.form-switch__label-content !{options.title}
+            div.toggle-switch(aria-hidden=true)
+                span.toggle-switch__button
+            

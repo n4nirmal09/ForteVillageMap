@@ -1,0 +1,38 @@
+
+mixin form-outline(options={})
+    .form-outline(class=options.modifiers, data-dropdown-select=options.dropdownSelect, data-dropdown-select-datepicker=options.dropdownSelectDatepicker)
+        if options.readonly
+            input.form-outline__input.form-control(id=options.id, value=options.value || '', class=options.inputModifiers, name=options.name || options.id, readonly, placeholder = options.placeholder || ' ', data-toggle=options.toggle, autocomplete="off")
+        else 
+            input.form-outline__input.form-control(id=options.id, value=options.value || '', class=options.inputModifiers, name=options.name || options.id, placeholder = options.placeholder || ' ', data-toggle=options.toggle,  autocomplete="off")
+        if(options.label)
+            label.form-outline__label(for=options.id) !{options.label}
+
+        if(options.icon)
+            i.material-icons(class=options.iconModifiers) !{options.icon}
+        if(options.actions)
+            div.form-outline__actions(class=options.actionsModifiers)
+                each item in options.actions 
+                    span.form-outline__actions-item(class=item.modifiers) 
+                        i.material-icons !{item.icon}
+
+        if options.dropdownSelectDatepicker
+            .dropdown-menu.dropdown-menu--datepicker(data-append-to=options.appendTo)
+                div.datepicker(id=options.pickerId)
+                    input(type="hidden" value=options.dateValue id=options.pickerId+'input' data-label-link='#'+options.id data-picker-input data-picker-options=options.pickerOption)
+        if options.dropdownItems 
+            .dropdown-menu.dropdown-menu--select-options(aria-labelledby='select-dropdown', data-append-to=options.appendTo)
+                each item in options.dropdownItems
+                    span.dropdown-item(data-selected=item.selected, data-value=item.value data-label=item.label) !{item.label}
+        if options.dropdownTable 
+            .dropdown-menu.dropdown-menu--select-results.dropdown-menu--fluid(aria-labelledby='select-results', data-append-to=options.appendTo)
+                .scrollable-area
+                    +table(options.dropdownTable)
+                .d-flex.justify-content-center 
+                    span.btn.btn-transparent.text-primary View more
+                
+
+
+            
+
+

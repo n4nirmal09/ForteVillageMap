@@ -88,3 +88,27 @@ $breakpoint in $grid-breakpoints {
   display: none!important;
 }
 
+// Shadows
+
+.shadow-sm {
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.elevated-1 {
+  box-shadow: 0 5px 5px -4px rgba(37, 17, 63, 11%);
+}
+
+.elevated-2 {
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.elevated-3 {
+  box-shadow: 0 1px 12px 0 rgba(0, 0, 0, 0.08);
+}
+.elevated-4 {
+  box-shadow: 0 4px 10px 0 rgba(55, 56, 60, 0.16), 0 0 2px 0 rgba(55, 56, 60, 0.48);
+}
+
+.elevated-5-top-side {
+  box-shadow: 0 -2px 5px -5px rgba(55, 56, 60, 0.5);
+}

@@ -2,6 +2,19 @@ import * as GoogleMap from '@googlemaps/js-api-loader';
 import { GOOGLE_API_KEY } from '@/scripts/config/google.config'
 import mapStyles from './map.style'
 
+const infoWindow = (({name, description, link, image}) => {
+    return `<div class="info-window">
+        <div class="info-window__body">
+            <h3 class="info-window__title">${name}</h3>
+            <div class="info-window__scrollable-area">
+                <div class="info-window__desc">${description}</div>
+                ${image ? `<img class="info-window__img" src="${image}" />` : ''}
+            </div>
+            
+        </div>
+    </div>`
+})
+
 export default class GMap {
     constructor(mapEle, loaderOptions) {
         this.$map = mapEle
@@ -123,6 +136,7 @@ export default class GMap {
         })
         marker.setMap(this.Map)
         marker.addListener("click", () => this.markerClick(marker))
+        marker.infoWindow = this.createInfoWindow(marker.details)
         this.markers.push(marker)
         return marker
 
@@ -132,6 +146,7 @@ export default class GMap {
         this.selectedMarker = null
         this.markers.forEach((marker) => {
             marker.setMap(null)
+            marker.infoWindow?.close()
         })
         this.markers = []
     }
@@ -159,6 +174,22 @@ export default class GMap {
         this.groundOverlays.forEach((overlay, i) => {
             overlay.img.setMap(null)
             this.groundOverlays.splice(i,1)
+        })
+    }
+
+    // Create Infowindows
+    createInfoWindow(content) {
+        let infoString = infoWindow(content)
+        return new google.maps.InfoWindow({
+            content: infoString,
+        })
+    }
+
+    showInfoWindow(marker) {
+        if(!marker.infoWindow) return
+        marker.infoWindow.open({
+            anchor: marker,
+            map: this.Map
         })
     }
 
@@ -190,9 +221,11 @@ export default class GMap {
         this.markers.forEach((marker) => {
             const icon = this.iconMaker(marker.details.icon, this.svgMarker)
             marker.setIcon(icon)
+            marker.infoWindow?.close()
             marker.setZIndex(1)
         })
         this.selectedMarker.setIcon(this.iconMaker(marker.details.iconActive || marker.details.icon, this.svgMarkerActive))
+        this.showInfoWindow(this.selectedMarker)
         this.selectedMarker.setZIndex(2)
     }
 

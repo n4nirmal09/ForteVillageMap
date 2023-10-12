@@ -1,19 +1,42 @@
 extends ./layouts/master.pug
+include ./mixins/form-outline.pug
 block header 
   header Header
 block content
   div.container
+    +form-outline({
+      modifiers: 'form-outline--text-line form-outline--icon-right',
+      inputModifiers: 'form-select form-solo',
+      placeholder: 'Search',
+      dropdownSelect: 'true',
+      toggle: 'dropdown-toggle',
+      icon: 'expand_more',
+      appendTo: 'body',
+      dropdownItems: [{
+        value: 'select A',
+        label: 'select A',
+        selected: false
+      },{
+        value: 'select B',
+        label: 'select B',
+        selected: false
+      },{
+        value: 'option C', 
+        label: 'option C',
+        selected: false
+      }]
+    })
     .map-filter#forte-map-filter
       ul.map-filter__list.list-unstyled.list-row
         each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}]
           li.map-filter__item.list-col
-            input.map-filter__item-input(type="checkbox", name="map-filter", value=i.value, checked = i.selected) 
+            input.map-filter__item-input(type="checkbox" name="map-filter", value=i.value, checked = i.selected) 
             label.map-filter__item-label !{i.name}
     //- .map-filter#forte-map-filter-radio
     //-   ul.map-filter__list
     //-     each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}]
     //-       li.map-filter__item 
-    //-         input.map-filter__item-input(type="radio", name="map-filter", value=i.value, checked = i.selected) 
+    //-         input.map-filter__item-input(type="radio" name="map-filter", value=i.value, checked = i.selected) 
     //-         label.map-filter__item-label !{i.name}
 
     .aspect-ratio--16x9 
@@ -23,7 +46,7 @@ block content
         "zoomLevel": 16,
         "overlay": require("@images/MAPNEWNEWNEW.jpg").default},
       ], data-map-options={
-        zoom: 16,
+        zoom: 16, 
         center: { lat: 38.932583, lng: 8.932833 },
         minZoom: 16,
         maxZoom: 19,
@@ -43,7 +66,14 @@ block content
       data-filter-link="#forte-map-filter"
       data-append-legends-to="#forte-map-legends"
       )
-    #forte-map-legends(style="--max-height:200px")
+
+    .accordion
+      .accordion-trigger 
+        span.accordion-trigger__button 
+          i.material-symbols-outlined expand_more
+      .accordion-panel
+        .accordion-panel__inner
+          #forte-map-legends.accordion 
 
 block footer
   footer footer

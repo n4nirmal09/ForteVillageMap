@@ -1,0 +1,202 @@
+.form-control {
+    line-height: 1;
+    height     : $input-text-height;
+
+    &--regular {
+        padding-left : 0 !important;
+        padding-right: 0 !important;
+        border       : 0 !important;
+        background   : transparent !important;
+
+        &+label {
+            left: 0;
+        }
+
+    }
+
+    &--transparent {
+        background: transparent !important;
+    }
+
+    &--flat {
+        border-radius: 0;
+        border-color : transparent;
+    }
+
+    &--auto {
+        width: auto;
+    }
+
+    &--inactive {
+        background-color: theme-color('disabled');
+        border-color: transparent;
+    }
+
+    &.error {
+        border-color: theme-color('error') !important;
+    }
+
+    &:disabled {
+        height          : 60px;
+        background-color: theme-color('disabled') !important;
+        padding         : 16px !important;
+        opacity         : 1;
+    }
+}
+
+
+.form-outline {
+    position: relative;
+
+    &__label {
+        position      : absolute;
+        left          : $input-padding-x;
+        top           : 50%;
+        transform     : translateY(-50%);
+        pointer-events: none;
+        @include text-truncate();
+        font-weight: $font-weight-normal;
+        transition : ease 0.2s;
+        color      : theme-color('grey-dark');
+    }
+    
+
+    &__input {
+
+        &:not(.form-solo) {
+            padding-top   : $input-padding-y+1;
+            padding-bottom: $input-padding-y;
+            height: 52px;
+        }
+        
+
+        &:not(.form-solo):focus,
+        &:not(.form-solo):not(:placeholder-shown) {
+            &+label {
+                top      : 18px;
+                font-size: $font-size-sm;
+            }
+        }
+
+        border: none;
+        width: 100%;
+        padding-left: $input-padding-x;
+    }
+
+    textarea.form-outline__input {
+        height: 104px;
+        resize: none;
+
+        &~label {
+            transform: none;
+            top      : 20px;
+        }
+
+        &:focus,
+        &:not(:placeholder-shown) {
+            &+label {
+                top      : 5px;
+                font-size: $font-size-sm;
+            }
+        }
+    }
+
+    &--flat {
+        >.form-outline__input {
+            padding-left    : 0;
+            padding-right   : 0;
+            background-color: transparent;
+            border          : none;
+            border-radius   : 0;
+        }
+
+        >.form-outline__label {
+            left: 0;
+        }
+    }
+
+    &--icon-right {
+        position: relative;
+
+        >.form-outline__input {
+            padding-right: 2.8rem;
+        }
+
+        >i {
+            position : absolute;
+            right    : 1rem;
+            top      : 50%;
+            transform: translateY(-50%);
+            color    : theme-color('primary');
+        }
+    }
+
+    &--icon-left {
+        position: relative;
+
+        >.form-outline__input {
+            padding-left: 2.8rem;
+        }
+
+        >i {
+            position : absolute;
+            left    : 1rem;
+            top      : 50%;
+            transform: translateY(-50%);
+            color    : theme-color('primary');
+        }
+
+        > label {
+            left: 2.8rem;
+        }
+    }
+
+
+    &--text-line {
+        .form-outline {
+            &__input {
+                border-left: 0;
+                border-top: 0;
+                border-right: 0;
+                border-radius: 0;
+                padding-bottom: 2px;
+                padding-left: 5px;
+                height: 30px;
+
+                border-bottom: 2px solid;
+
+                &:focus{
+                    outline: none;
+                }
+            }
+        }
+
+        
+    }
+
+    &[data-dropdown-select] {
+        i {
+            pointer-events: none;
+        }
+    }
+
+    &--search {
+        width: 380px;
+    }
+}
+
+
+
+select {
+    &.form-control {
+        background-image: $form-select-indicator;
+        appearance: auto;
+    }
+}
+
+textarea {
+    &.form-control {
+        height: auto;
+    }
+}
+

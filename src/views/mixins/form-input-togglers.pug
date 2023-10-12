@@ -1,0 +1,12 @@
+mixin form-input-togglers(options={})
+    .form-input-togglers(class=options.modifiers)
+        input.form-input-togglers__input(
+            type=options.type,
+            checked=options.checked,
+            name=options.name,
+            id=options.id,
+            value=options.value
+        )
+        label.form-input-togglers__label(for=options.id, class=options.labelModifiers) 
+            if options.label
+                span.form-input-togglers__label-content !{options.label}

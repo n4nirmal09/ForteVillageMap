@@ -1,0 +1,61 @@
+include ./button.pug
+include ./form-switch.pug
+include ./form-input-togglers.pug
+mixin dropdown(options={})
+    .dropdown(data-dropdown-select-datepicker=options.picker, data-dropdown-select=options.dropdownSelect, class=options.modifiers)
+        div(role='button' data-toggle='dropdown', aria-haspopup='true' aria-expanded='false', data-trigger-hook=options.triggerHook, class=options.triggerModifiers)
+            +button(options.button)
+        if options.items
+            .dropdown-menu(class=options.panelModifiers, data-append-to=options.appendTo, data-placement=options.menuPlacement, data-offset-placement=options.offsetPlacement)
+                if !options.noHeader
+                    .dropdown-menu__search
+                        input.dropdown-menu__search-input(type="text", name="", placeholder="Search")
+                .dropdown-menu__body
+                    each item in options.items
+                        a.dropdown-item(href=item.link, 
+                        data-label=item.title, 
+                        data-value=item.value, 
+                        data-widget=item.widget, 
+                        data-search-by=item.dataSearchBy, 
+                        data-default-range=item.defaultRange, 
+                        data-duration-options=item.durationOptions,
+                        data-year-options=item.yearOptions,
+                        data-int-max-val=item.dataIntMaxVal
+                        data-int-min-val=item.dataIntMinVal
+                        data-char-max-val = item.dataCharMaxVal
+                        data-char-min-val = item.dataCharMinVal
+                        data-placeholder = item.placeholder
+                        data-score-min = item.scoreMin
+                        data-score-max = item.scoreMax
+                        data-steps = item.steps
+                        data-input-setting=item.inputSetting
+                        data-value-prefix=item.valuePrefix
+                        class=item.modifiers)
+                            if item.icon
+                                .dropdown-item__icon
+                                    i.material-symbols-outlined.me-3 !{item.icon}
+                            .dropdown-item__content(class=item.contentModifiers)
+                                if item.formSwitch
+                                    +form-switch(item.formSwitch)
+                                else
+                                    | !{item.title} 
+        else if options.dropdownSelectDatepicker
+            .dropdown-menu.dropdown-menu--datepicker(class= options.dropdownSelectDatepickerB ? 'dropdown-menu--datepicker-extended' : '', data-append-to=options.appendTo, data-placement=options.menuPlacement)
+                div.datepicker(id=options.dropdownSelectDatepicker.id)
+                    input(type="hidden" 
+                    value=options.dropdownSelectDatepicker.dateValue 
+                    id=options.dropdownSelectDatepicker.id+'input' 
+                    data-label-link=options.dropdownSelectDatepicker.labelId  ? '#'+options.dropdownSelectDatepicker.labelId : ''
+                    data-picker-options=options.dropdownSelectDatepicker.pickerOptions
+                    data-picker-input data-date-single=options.dropdownSelectDatepicker.singlePicker )
+                if options.dropdownSelectDatepickerB
+                    div.datepicker--b(id=options.dropdownSelectDatepickerB.id)
+                            input(type="hidden" 
+                            value=options.dropdownSelectDatepickerB.dateValue 
+                            id=options.dropdownSelectDatepickerB.id+'input' 
+                            data-picker-options=options.dropdownSelectDatepickerB.pickerOptions
+                            data-label-link=options.dropdownSelectDatepickerB.labelId  ? '#'+options.dropdownSelectDatepickerB.labelId : ''
+                            data-picker-input data-date-single=options.dropdownSelectDatepickerB.singlePicker )
+        else 
+            .dropdown-menu(data-placement=options.menuPlacement)
+                h2 Drop Down 

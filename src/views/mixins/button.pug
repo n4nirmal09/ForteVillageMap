@@ -1,0 +1,28 @@
+mixin button(options={})
+    a.btn(href=options.link ? options.link : "#", class=options.modifiers, data-toggle=options.toggle, data-tooltip-placement=options.tooltipPlacement, data-tooltip-modifiers=options.tooltipModifiers, data-html=options.tooltipIsHtml, data-original-title=options.tooltipHtml, data-tooltip-trigger=options.tooltipTrigger, data-target=options.target) 
+        if options.btnPrefix
+            span.small.btn__prefix !{options.btnPrefix}
+        if options.iconLeft 
+            i.me-2.material-icons(class = options.iconModifiers) !{options.iconLeft}
+        if options.iconLeftWithSub
+            span.me-2.d-flex.align-items-center
+                i.material-icons(class = options.iconModifiers) !{options.iconLeftWithSub}
+                span !{options.iconLeftSub}
+        if options.iconGlyphLeft
+            i.me-2(class='icon-glyph-' + options.iconGlyphLeft)
+        if options.title
+            span.btn__content(id=options.labelId, class=options.contentModifiers) !{options.title}
+        if options.iconRight 
+            i.ms-2.material-icons !{options.iconRight}
+        if options.icon 
+            if options.icon.iconGlyph 
+                i(class='icon-glyph-' + options.icon.iconGlyph)
+            else 
+                i.material-icons !{options.icon}
+        if options.spinner 
+            span.spinner.ms-2
+                span.spinner-border 
+                    span.sr-only  loading
+        if options.badge 
+            span.badge.badge--dot(class=options.badge.modifiers)
+

@@ -7,9 +7,9 @@
         "image": null,
         "type": "hotel",
         "link": "null",
-        "icon": "./images/icon-custom.png",
+        "icon": "./images/logo-symbol.svg",
         "label": "Fortevillage hotel castello",
-        "description": "Poda dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem. Dolore cillum consectetur enim pariatur ad pariatur ad eiusmod culpa in. Incididunt deserunt magna adipisicing aliquip occaecat nostrud pariatur id."
+        "description": "<p>Poda dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem.</p> <p><a class='' href='#'>Link</a></p>"
     },
     {
         "name": "Forte Village Resort - Hotel Pineta",

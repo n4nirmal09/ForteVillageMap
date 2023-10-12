@@ -132,3 +132,39 @@ $modal-content-padding: 15px;
         padding-left: 10px;
     }
 }
+
+.info-window {
+    width: 320px;
+    height: 250px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &__body {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__title {
+        flex: 0 0 auto;
+    }
+
+    &__desc {
+        margin-bottom: 1rem;
+    }
+
+    &__scrollable-area {
+        flex: 1;
+        overflow: hidden;
+        overflow-y: auto;
+    }
+
+
+    &__img {
+        display: block;
+        max-width: 100%!important;
+    }
+    
+}
