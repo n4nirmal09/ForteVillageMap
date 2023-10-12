@@ -165,15 +165,32 @@ export const MapController = (() => {
         createLegends(legends) {
             
             if(!this.options.appendLegendsTo) return
+            const categories = legends.map((legend) => {
+                return {
+                    name: legend.categoryName || '',
+                    value: legend.type
+                }
+            })
+
             this.options.appendLegendsTo.innerHTML = ``
             const legendList = document.createElement('ul')
             legendList.classList.add('legends-list')
 
-            legends.forEach((legend) => {
-                legendList.appendChild(this.createLegend({
-                    ...legend
-                }))
+            categories.forEach((category) => {
+                const categoryColumn = document.createElement('li')
+                categoryColumn.classList.add('legends-list__item')
+                categoryColumn.innerHTML = `<span class="legends-list__category-name">${category.name || category.value}</span>`
+                const categoryList = document.createElement('ul')
+                categoryList.classList.add('legends-list', 'legends-list--inner')
+                legends.filter((legend) => legend.type === category.value).forEach((filteredLegend) => {
+                    categoryList.appendChild(this.createLegend({
+                        ...filteredLegend
+                    }))
+                })
+                categoryColumn.appendChild(categoryList)
+                legendList.appendChild(categoryColumn)
             })
+
 
             this.options.appendLegendsTo.appendChild(legendList)
             
@@ -182,9 +199,8 @@ export const MapController = (() => {
         createLegend(legend) {
             const legendItem = document.createElement('li')
             legendItem.classList.add('legends-list__item')
-            legendItem.innerHTML= `<span class="legends-list__name">${legend.name}</span>`
+            legendItem.innerHTML= `<span class="legends-list__legend-name">${legend.name}</span>`
             legendItem.addEventListener('click', () => {
-                console.log(legend.markerIndex)
                 this.Map.selectMarker(legend.markerIndex)
             })
             return legendItem

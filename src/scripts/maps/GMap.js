@@ -36,7 +36,7 @@ export default class GMap {
         this.selectedMarker = null
 
         this.events = []
-        this.groundOverlay - null
+        this.groundOverlays = []
         this.init()
     }
 
@@ -143,18 +143,23 @@ export default class GMap {
             new google.maps.LatLng(coords.S, coords.W),//South West coordinates
             new google.maps.LatLng(coords.N, coords.E)); //North east coordinates
 
-        this.groundOverlay = new google.maps.GroundOverlay(OverlayImg, imageBounds);
-        this.addGroundOverlays()
+        const overlay = {
+            img: new google.maps.GroundOverlay(OverlayImg, imageBounds)
+        }
+        this.addGroundOverlay(overlay)
     }
 
-    addGroundOverlays() {
-        if (!this.groundOverlay) return
-        this.groundOverlay.setMap(this.Map);
+    addGroundOverlay(overlay) {
+        overlay.img.setMap(this.Map)
+        this.groundOverlays.push(overlay)
     }
 
     removeGroundOverlays() {
-        if (!this.groundOverlay) return
-        this.groundOverlay.setMap(null)
+        if (!this.groundOverlays.length) return
+        this.groundOverlays.forEach((overlay, i) => {
+            overlay.img.setMap(null)
+            this.groundOverlays.splice(i,1)
+        })
     }
 
     // Events
