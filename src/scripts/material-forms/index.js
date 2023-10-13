@@ -13,10 +13,6 @@
                 const { SelectDropdown } = await import(/* webpackChunkName: "materialSelect" */ './Select')
                 window.SelectDropdown = SelectDropdown
                 break
-            case 'forms':
-                const { Forms } = await import(/* webpackChunkName: "materialInputs" */ './Forms')
-                window.Forms = Forms
-                break
         }
-    })
+    }) 
 })()

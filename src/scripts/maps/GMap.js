@@ -216,7 +216,10 @@ export default class GMap {
     // Event handlers
     toggleMarkerActive(marker) {
 
-        if (this.selectedMarker === marker) return
+        if (this.selectedMarker === marker) {
+            this.showInfoWindow(marker)
+            return
+        }
         this.selectedMarker = marker
         this.markers.forEach((marker) => {
             const icon = this.iconMaker(marker.details.icon, this.svgMarker)

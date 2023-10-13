@@ -31,6 +31,7 @@ export const SiteSetup = (function (window) {
     function _loadModuleChunks() {
         return Promise.all([
             import('@/scripts/maps'),
+            import('@/scripts/dropdowns'),
             import('@/scripts/material-forms'),
         ])
     }

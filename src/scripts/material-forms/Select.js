@@ -8,6 +8,7 @@ export class SelectDropdown extends Dropdown.DropdownMain {
         this.selectedValue = null
         this.selectOptions = gsap.utils.toArray(this.container.querySelectorAll('.dropdown-item'))
 
+        this.selectSwitches  = !!this.container.dataset.dropdownSelectSwitches || false
         this.widget = null
         this.widgetSubmitBtnTitle = this.container.dataset.widgetFooterBtnTitle || 'Add'
         this.widgetContainer = null
@@ -130,7 +131,10 @@ export class SelectDropdown extends Dropdown.DropdownMain {
         }
 
 
-        this.selectOptions.forEach((option) => option.addEventListener("click", (e) => this.selectOption(e)))
+        this.selectOptions.forEach((option) => {
+            if(this.selectSwitches) return
+            option.addEventListener("click", (e) => this.selectOption(e))
+        })
 
         // Nulling on document click
         document.addEventListener('click', (event) => {

@@ -78,6 +78,14 @@ $breakpoint in $grid-breakpoints {
   flex-wrap: wrap;
 }
 
+.flex-1 {
+  flex: 1;
+}
+
+.flex-auto {
+  flex: 0 0 auto;
+}
+
 // Spacing
 .ml-2 {
   margin-left: 2rem;

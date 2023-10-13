@@ -30,6 +30,7 @@ $z-index-higher-priority: 99999;
         display: flex;
         flex-direction: column;
 
+        &--fill,
         &--select-options,
         &--datepicker {
             width: 100%;

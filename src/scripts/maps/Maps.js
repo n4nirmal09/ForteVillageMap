@@ -6,6 +6,7 @@ import {
 
 import modalTpl from "./templates/map-modal.template"
 import { utilities } from "@/scripts/common/utilities"
+import { SelectDropdown } from "@/scripts/material-forms/Select"
 
 export const MapController = (() => {
     class ForteVillageMap {
@@ -180,15 +181,25 @@ export const MapController = (() => {
                 const categoryColumn = document.createElement('li')
                 categoryColumn.classList.add('legends-list__item')
                 categoryColumn.innerHTML = `<span class="legends-list__category-name">${category.name || category.value}</span>`
+
+                const categoryDropDown = document.createElement('div')
+                categoryDropDown.classList.add('form-outline', 'form-outline--text-line', 'form-outline--icon-right')
+                categoryDropDown.dataset.dropDownSelect = true
+                categoryDropDown.dataset.dropdownSelectSwitches = true
+                categoryDropDown.innerHTML = `<input class="legends-list__filter-input form-outline__input form-control form-select form-solo" value="" placeholder="Search" data-toggle="dropdown-toggle" autocomplete="off"><i class="material-icons">expand_more</i>`
+
                 const categoryList = document.createElement('ul')
-                categoryList.classList.add('legends-list', 'legends-list--inner')
+                categoryList.classList.add('legends-list', 'legends-list--inner', 'dropdown-menu', 'dropdown-menu--select-options')
                 legends.filter((legend) => legend.type === category.value).forEach((filteredLegend) => {
                     categoryList.appendChild(this.createLegend({
                         ...filteredLegend
                     }))
                 })
-                categoryColumn.appendChild(categoryList)
+
+                categoryDropDown.appendChild(categoryList)
+                categoryColumn.appendChild(categoryDropDown)
                 legendList.appendChild(categoryColumn)
+                new SelectDropdown(categoryDropDown)
             })
 
 
@@ -198,7 +209,9 @@ export const MapController = (() => {
 
         createLegend(legend) {
             const legendItem = document.createElement('li')
-            legendItem.classList.add('legends-list__item')
+            legendItem.classList.add('legends-list__item', 'dropdown-item')
+            legendItem.dataset.label = `${legend.name}`
+            legendItem.dataset.value = `${legend.type}`
             legendItem.innerHTML= `<span class="legends-list__legend-name">${legend.name}</span>`
             legendItem.addEventListener('click', () => {
                 this.Map.selectMarker(legend.markerIndex)
@@ -217,8 +230,14 @@ export const MapController = (() => {
             inputs.forEach((input) => {
                 if(input.checked) checkedValues.push(input.value)
             })
-
             this.markersFilter = checkedValues
+
+            const markersFilterInput = this.options.markersFilterElement?.querySelector('.map-filter__input')
+            if(checkedValues.findIndex((val) => val === 'all') !== -1) {
+                markersFilterInput.value = ''
+                return
+            }
+            if(markersFilterInput) markersFilterInput.value = checkedValues.filter((val) => val !== 'all').join(', ')
         }
 
         // Modal detail functions
