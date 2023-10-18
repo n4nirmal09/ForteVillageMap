@@ -67,9 +67,14 @@ block content
     .aspect-ratio--16x9 
       .aspect-ratio__inner-content 
         div.forte-map.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/hotspots.json", 
-        data-ground-overlays=[{"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
+        data-ground-overlays=[
+          {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
         "zoomLevel": 16,
         "overlay": require("@images/MAPNEWNEWNEW.jpg").default},
+        {"coordinates":{"S": 38.932620704645785, "W": 8.92253632248336, "N": 38.9372024040459, "E": 8.923115679610873}, 
+        "zoomLevel": 16,
+        "overlay": require("@images/Offset-1.png").default
+        }
       ], data-map-options={
         zoom: 16, 
         center: { lat: 38.932583, lng: 8.932833 },

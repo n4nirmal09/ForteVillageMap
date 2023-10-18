@@ -320,19 +320,21 @@ export const MapController = (() => {
         // Set ground overlays
         updateGroundOverlay() {
             if(!this.Map) return
+            this.Map.removeGroundOverlays()
             const mainOverlay = this.mainOverlaySetter()
-            if(!mainOverlay) return
-            this.Map.setGroundOverlay(mainOverlay.coordinates, mainOverlay.overlay)
+            if(!mainOverlay.length) return
+            mainOverlay.forEach((item) => this.Map.setGroundOverlay(item.coordinates, item.overlay))
+            
         }
 
         mainOverlaySetter() {
             const zoomLevel = this.Map.getMap().getZoom()
-            let mainOverlay = null
-            this.groundOverlays.forEach((overlaySet) => {
-                if(zoomLevel >= overlaySet.zoomLevel) mainOverlay = overlaySet
-            })
+            let mainOverlays = this.groundOverlays.filter((overlaySet) => zoomLevel >= overlaySet.zoomLevel)
+            // this.groundOverlays.forEach((overlaySet) => {
+            //     if(zoomLevel >= overlaySet.zoomLevel) mainOverlay = overlaySet
+            // })
 
-            return mainOverlay
+            return mainOverlays
         }
 
         // Loaders

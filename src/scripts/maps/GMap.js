@@ -153,7 +153,7 @@ export default class GMap {
 
     // GroundOverlays
     setGroundOverlay(coords, OverlayImg) {
-        this.removeGroundOverlays()
+        //this.removeGroundOverlays()
         const imageBounds = new google.maps.LatLngBounds(
             new google.maps.LatLng(coords.S, coords.W),//South West coordinates
             new google.maps.LatLng(coords.N, coords.E)); //North east coordinates
