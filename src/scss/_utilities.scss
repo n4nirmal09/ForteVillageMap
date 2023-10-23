@@ -86,9 +86,17 @@ $breakpoint in $grid-breakpoints {
   flex: 0 0 auto;
 }
 
+.d-block {
+  display: block;
+}
+
 // Spacing
 .ml-2 {
   margin-left: 2rem;
+}
+
+.mt-2 {
+  margin-top: 2rem;
 }
 
 // Displays

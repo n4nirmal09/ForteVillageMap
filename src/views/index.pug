@@ -68,24 +68,24 @@ block content
       .aspect-ratio__inner-content 
         div.forte-map.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/hotspots.json", 
         data-ground-overlays=[
-          {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
+        {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
         "zoomLevel": 16,
-        "overlay": require("@images/MAPNEWNEWNEW.jpg").default},
-        {"coordinates":{"S": 38.932620704645785, "W": 8.92253632248336, "N": 38.9372024040459, "E": 8.923115679610873}, 
+        "overlay": "images/MAPNEWNEWNEW.jpg"},
+        {"coordinates":{"S": 38.92836424033743, "W": 8.92, "N": 38.94287213966831, "E": 8.924896661531204}, 
         "zoomLevel": 16,
-        "overlay": require("@images/Offset-1.png").default
-        }
+        "overlay": "images/Offset-2.png"
+        },
       ], data-map-options={
         zoom: 16, 
-        center: { lat: 38.932583, lng: 8.932833 },
+        center: { lat:  38.93240924257542, lng: 8.931271334750678},
         minZoom: 16,
         maxZoom: 19,
         restriction: {
           latLngBounds: {
             north: 38.94287213966831,
             south: 38.92836424033743,
-            east: 8.937440372730721,
-            west: 8.924896661531204,
+            east: 8.945,
+            west: 8.91,
           },
           strictBounds: false,                     
         },
@@ -96,6 +96,150 @@ block content
       data-filter-link="#forte-map-filter"
       data-append-legends-to="#forte-map-legends"
       )
+  .container 
+    .d-flex 
+      .col-auto
+        label.mt-2.d-block(for="map-options-text")  Map Options
+        textarea.form-control#map-options-text(name="" autocomplete="off" spellcheck="false" cols="80" rows="20" value="") {zoom: 16, center: { lat:  38.93240924257542, lng: 8.931271334750678},minZoom: 16,maxZoom: 19,restriction: {latLngBounds: {north: 38.94287213966831,south: 38.92836424033743,east: 8.945,west: 8.91,},strictBounds: false, },disableDefaultUI: true,zoomControl: true}
+      .col-auto    
+        label.mt-2.d-block(for="overlay-options-text")  Overlay Options
+        textarea.form-control#overlay-options-text(name="" autocomplete="off" spellcheck="false" cols="80" rows="20" value="") [{coordinates:{S:38.92836424033743,W:8.924896661531204,N:38.94287213966831,E:8.937440372730721},zoomLevel:16,overlay:"./images/MAPNEWNEWNEW.jpg"},{coordinates:{S:38.92836424033743,W:8.92,N:38.94287213966831,E:8.924896661531204},zoomLevel:16,overlay:"./images/Offset-2.png"}]
+    
+    
+    
 
+    .aspect-ratio--16x9 
+      .aspect-ratio__inner-content#map-preview
+    p.mt-2 HTML Code Preview
+    pre#map-html-preview.mt-2
 block footer
   footer footer
+block scripts 
+  script. 
+    window.moduleChunks = {"utilities": ['maps']}
+    window.addEventListener('load', function() {
+      previewMap()
+    })
+
+    function previewMap() {
+      const previewWindow = document.querySelector('#map-preview')
+      const mapOptionsTextArea = document.querySelector('#map-options-text')
+      const overlayOptionsTextArea = document.querySelector('#overlay-options-text')
+      const mapHtmlPreview = document.querySelector('#map-html-preview')
+      let mapOptions = {
+        zoom: 16, 
+        center: { lat:  38.93240924257542, lng: 8.931271334750678},
+        minZoom: 16,
+        maxZoom: 19,
+        restriction: {
+          latLngBounds: {
+            north: 38.94287213966831,
+            south: 38.92836424033743,
+            east: 8.945,
+            west: 8.91,
+          },
+          strictBounds: false,                     
+        },
+        disableDefaultUI: true,
+        zoomControl: true
+      }
+
+      let groundOverlays = [
+        {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
+        "zoomLevel": 16,
+        "overlay": "./images/MAPNEWNEWNEW.jpg"},
+        {"coordinates":{"S": 38.92836424033743, "W": 8.92, "N": 38.94287213966831, "E": 8.924896661531204}, 
+        "zoomLevel": 16,
+        "overlay": "./images/Offset-2.png"
+        },
+
+      ]
+
+      updateInputAreas();
+      
+      updatePreviewEditor();
+
+      function optionsParser(textInp) {
+        try {
+          let value = textInp.value;
+          let json = null;
+
+          try {
+            json = JSON.parse(value)
+          } catch (jsonError) {
+            try {
+                const evalFunction = new Function(`return ${value}`)
+                json = evalFunction();
+                
+            } catch (evalError) {
+                return false
+            }
+          }
+          return JSON.stringify(json, null, 2)
+        } catch (error) {
+          return false
+        }
+
+      }
+
+      function updateInputAreas() {
+        if(getToken('mapoptions')) mapOptionsTextArea.value = getToken('mapoptions')
+        if(getToken('overlayoptions')) overlayOptionsTextArea.value = getToken('overlayoptions')
+      }
+
+      function updatePreviewEditor() {
+        mapOptions = optionsParser(mapOptionsTextArea)
+        groundOverlays = optionsParser(overlayOptionsTextArea)
+        saveToken('mapoptions', mapOptionsTextArea.value)
+        saveToken('overlayoptions', overlayOptionsTextArea.value)
+        createMapHtml()
+        
+      }
+
+      function createMapHtml() {
+        previewWindow.innerHTML = '';
+        const mapDiv  = document.createElement('div')
+        mapDiv.classList.add('interactive-map')
+        mapDiv.dataset.groundOverlays = groundOverlays
+        mapDiv.dataset.mapOptions = mapOptions
+        mapDiv.dataset.mapStyles = "./js/data/map.style.json"
+
+        mapHtmlPreview.textContent = `${mapDiv.outerHTML}`
+        previewWindow.appendChild(mapDiv)
+        new MapController.ForteVillageMap(mapDiv, {
+          editorMode: true
+        })
+      }
+
+      function debounce(func, wait, immediate) {
+        var timeout;
+        return function () {
+            var context = this,
+                args = arguments;
+            var later = function () {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        }
+      }
+
+      function getToken(key) {
+        return window.localStorage.getItem(key);
+      }
+
+      function saveToken(key, token) {
+        window.localStorage.setItem(key, token)
+      }
+
+      function destroyToken(key) {
+        window.localStorage.removeItem(key)
+      }
+
+      mapOptionsTextArea.addEventListener('input', debounce(updatePreviewEditor, 250, false))
+      overlayOptionsTextArea.addEventListener('input', debounce(updatePreviewEditor, 250, false))
+
+    }

@@ -1,6 +1,7 @@
 .form-control {
     line-height: 1;
     height     : $input-text-height;
+    display: block;
 
     &--regular {
         padding-left : 0 !important;
@@ -200,3 +201,10 @@ textarea {
     }
 }
 
+pre {
+    border: 1px solid;
+    padding: 20px;
+    display: block;
+    background-color: darkslategrey;
+    color: white;
+}

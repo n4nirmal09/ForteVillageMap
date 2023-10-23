@@ -21,6 +21,8 @@ export default class GMap {
         this.Map = null
         this.MapLoader = null
         this.googleMapLoaderOptions = loaderOptions || {}
+        this.editorMode = !!this.$map.dataset.editorMode  || false
+        this.zoomTimer = null
         this.setupOptions = {
             center: { lat: 38.932583, lng: 8.932833 },
             zoom: 7,
@@ -154,27 +156,38 @@ export default class GMap {
     // GroundOverlays
     setGroundOverlay(coords, OverlayImg) {
         //this.removeGroundOverlays()
+        
         const imageBounds = new google.maps.LatLngBounds(
             new google.maps.LatLng(coords.S, coords.W),//South West coordinates
             new google.maps.LatLng(coords.N, coords.E)); //North east coordinates
 
         const overlay = {
-            img: new google.maps.GroundOverlay(OverlayImg, imageBounds)
+            img: new google.maps.GroundOverlay(OverlayImg, imageBounds),
         }
         this.addGroundOverlay(overlay)
     }
 
     addGroundOverlay(overlay) {
+        if(this.editorMode) overlay.img.addListener("rightclick", (e) => this.onRightClick(e))
+        
         overlay.img.setMap(this.Map)
+        
+        //overlay.addListener("rightclick", (e) => this.onRightClick(e))
         this.groundOverlays.push(overlay)
+        
     }
 
     removeGroundOverlays() {
         if (!this.groundOverlays.length) return
         this.groundOverlays.forEach((overlay, i) => {
             overlay.img.setMap(null)
-            this.groundOverlays.splice(i,1)
         })
+
+        this.groundOverlays = []
+
+        console.log(this.groundOverlays)
+
+        
     }
 
     // Create Infowindows
@@ -245,7 +258,20 @@ export default class GMap {
     }
 
     onMapZoom() {
-        this.$map.dispatchEvent(this.events['mapZoomed'])
+        if(this.zoomTimer) clearTimeout(this.zoomTimer)
+        this.zoomTimer = setTimeout(() => this.$map.dispatchEvent(this.events['mapZoomed']), 250)
+        //this.$map.dispatchEvent(this.events['mapZoomed'])
+    }
+
+    onRightClick(e) {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        const content = `Latitude: <strong>${lat}</strong><br>Longitude: <strong>${lng}</strong>`;
+        const infoWindow = new google.maps.InfoWindow();
+        infoWindow.setContent(content)
+        infoWindow.setPosition(e.latLng)
+        infoWindow.open(this.Map)
+       
     }
 
     // Marker Utilities
@@ -260,5 +286,7 @@ export default class GMap {
     // Listeners
     _addListeners() {
         this.Map.addListener("zoom_changed", () => this.onMapZoom())
+        if(this.editorMode) this.Map.addListener("rightclick", (e) => this.onRightClick(e))
+       
     }
 }

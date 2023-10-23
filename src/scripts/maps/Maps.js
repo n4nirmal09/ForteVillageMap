@@ -53,7 +53,8 @@ export const MapController = (() => {
                 stylesURL: this.container.dataset.mapStyles || GOOGLE_MAP_STYLE,
                 classPrepend: 'interactive-map',
                 markersFilterElement: document.querySelector(this.container.dataset.filterLink),
-                appendLegendsTo: this.container.dataset.appendLegendsTo ? document.querySelector(this.container.dataset.appendLegendsTo) : null
+                appendLegendsTo: this.container.dataset.appendLegendsTo ? document.querySelector(this.container.dataset.appendLegendsTo) : null,
+                editorMode: false
             },{
                 ...options
             })
@@ -94,6 +95,8 @@ export const MapController = (() => {
             if (this.mapCanvas) this.mapCanvas.remove()
             this.mapCanvas = document.createElement('div')
             this.mapCanvas.classList.add(`${this.options.classPrepend}__canvas`)
+            if(this.options.editorMode) this.mapCanvas.dataset.editorMode = true
+            if(this.options.editorMode) this.container.innerHTML = `<div> Editor mode: true</div>`
             this.container.appendChild(this.mapCanvas)
         }
 
@@ -321,9 +324,9 @@ export const MapController = (() => {
         updateGroundOverlay() {
             if(!this.Map) return
             this.Map.removeGroundOverlays()
-            const mainOverlay = this.mainOverlaySetter()
-            if(!mainOverlay.length) return
-            mainOverlay.forEach((item) => this.Map.setGroundOverlay(item.coordinates, item.overlay))
+            const mainOverlays = this.mainOverlaySetter()
+            if(!mainOverlays.length) return
+            mainOverlays.forEach((item) => this.Map.setGroundOverlay(item.coordinates, item.overlay))
             
         }
 
@@ -388,7 +391,7 @@ export const MapController = (() => {
             this.spotDetailClose.addEventListener("click", () => this.spotsDetailModalActive && this.showModal(false))
             this.container.addEventListener("mapZoomed", (e) => this.onMapZoom(e))
 
-            const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input')
+            const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input') || []
             filterInputs.forEach((input) => {
                 input.addEventListener('change', (e) => this.onFilterChange(e))
             })
