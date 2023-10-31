@@ -54,3 +54,7 @@
   .btn-outline-gray-light {
     @include button-outline-variant(theme-color("gray"));
   }
+
+  .btn-outline-dark {
+    @include button-outline-variant(theme-color("dark"));
+  }

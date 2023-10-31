@@ -24,13 +24,15 @@ export const MapController = (() => {
             this.markers = this.container.dataset.markers || []
             this.markersLoading = false
             this.markersFilter = ['all']
+            this.roadsURL = this.container.dataset.roads || null
+            this.roads = []
             this.modal = false
             this.inlineMapOptions = this.APIServices.isJson(this.container.dataset.mapOptions) ? JSON.parse(this.container.dataset.mapOptions) : {}
-            this.locale = this.APIServices.isJson(this.container.dataset.locale)  ? JSON.parse(this.container.dataset.locale) : {
+            this.locale = this.APIServices.isJson(this.container.dataset.locale) ? JSON.parse(this.container.dataset.locale) : {
                 "Go to": "Go to",
                 "Close": "Close",
             }
-            
+
             this.options = Object.assign({
                 mapOptions: {
                     restriction: {
@@ -40,7 +42,7 @@ export const MapController = (() => {
                             east: 8.937440372730721,
                             west: 8.924896661531204,
                         },
-                        strictBounds: false,                     
+                        strictBounds: false,
                     },
                     zoom: 18,
                     center: { lat: 38.932583, lng: 8.932833 },
@@ -50,17 +52,19 @@ export const MapController = (() => {
                     styles: '',
                     ...this.inlineMapOptions
                 },
-                stylesURL: this.container.dataset.mapStyles || GOOGLE_MAP_STYLE,
+                stylesURL: this.container.dataset.mapStyles || null,
                 classPrepend: 'interactive-map',
                 markersFilterElement: document.querySelector(this.container.dataset.filterLink),
                 appendLegendsTo: this.container.dataset.appendLegendsTo ? document.querySelector(this.container.dataset.appendLegendsTo) : null,
+                appendNavigationTo: this.container.dataset.appendNavigationTo ? document.querySelector(this.container.dataset.appendNavigationTo) : null,
                 editorMode: false
-            },{
+            }, {
                 ...options
             })
 
             this.groundOverlays = this.container.dataset.groundOverlays ? JSON.parse(this.container.dataset.groundOverlays) : []
-            
+            this.navigationPanel = null
+
             this._init()
         }
 
@@ -76,6 +80,8 @@ export const MapController = (() => {
             this.updateFilterOptions()
             const styles = await this.fetchGMapStyles()
             await this.fetchMarkers()
+            if(this.roadsURL) await this.fetchRoads()
+           
             this.options.mapOptions.styles = styles
             this.initGoogleMap()
             const images = await this.loadOverlayImages()
@@ -95,14 +101,14 @@ export const MapController = (() => {
             if (this.mapCanvas) this.mapCanvas.remove()
             this.mapCanvas = document.createElement('div')
             this.mapCanvas.classList.add(`${this.options.classPrepend}__canvas`)
-            if(this.options.editorMode) this.mapCanvas.dataset.editorMode = true
-            if(this.options.editorMode) this.container.innerHTML = `<div> Editor mode: true</div>`
+            if (this.options.editorMode) this.mapCanvas.dataset.editorMode = true
+            if (this.options.editorMode) this.container.innerHTML = `<div> Editor mode: true</div>`
             this.container.appendChild(this.mapCanvas)
         }
 
         createSpotDetailsModal() {
-            if(this.spotDetailsModal) this.spotDetailsModal.remove()
-            this.spotDetailsModal  = utilities.createNodeParsing(modalTpl({
+            if (this.spotDetailsModal) this.spotDetailsModal.remove()
+            this.spotDetailsModal = utilities.createNodeParsing(modalTpl({
                 mainClass: `${this.options.classPrepend}-modal`,
                 locale: this.locale
             }))
@@ -114,20 +120,20 @@ export const MapController = (() => {
         // Fetching Styles
         async fetchGMapStyles() {
             return this.APIServices.getFetch(this.options.stylesURL)
-                    .then((data) => {
-                        this.markersLoading = false
-                        return data
-                    })
+                .then((data) => {
+                    this.markersLoading = false
+                    return data
+                })
         }
 
         // Google map 
         async initGoogleMap() {
-            if(!this.mapCanvas) return
+            if (!this.mapCanvas) return
             this.Map = null
             this.Map = new GMap(this.mapCanvas, this.googleMapLoaderOptions)
             const google = await this.Map.loadMap()
             this.Map.setMap(google, this.options.mapOptions)
-            
+
             this.updateMarkers()
             this.updateGroundOverlay()
         }
@@ -135,7 +141,7 @@ export const MapController = (() => {
         //Markers
         // ---- Fetching Markersdata
         async fetchMarkers() {
-            if(!this.markers || this.markers.length === 0) return
+            if (!this.markers || this.markers.length === 0) return
             if (!this.APIServices.isJson(this.markers)) {
                 this.markersLoading = true
                 return this.APIServices.getFetch(this.markers)
@@ -148,11 +154,23 @@ export const MapController = (() => {
             return this.parseData(JSON.parse(this.markers))
         }
 
+        async fetchRoads() {
+            if (!this.APIServices.isJson(this.roadsURL)) {
+                return this.APIServices.getFetch(this.roadsURL)
+                .then((data) => {
+                    console.log(data)
+                    return data
+                })
+            }
+            
+            return this.parseData(JSON.parse(this.roadsURL))
+        }
+
         updateMarkers() {
-            if(!this.Map) return
+            if (!this.Map) return
             const hotSpots = this.markers
             this.Map.removeAllMarkers()
-            const filteredMarkers = hotSpots.filter((spot) => (this.markersFilter.findIndex((markerType) => markerType === spot.type || markerType === 'all') !== -1 )).map((marker, markerIndex) => {
+            const filteredMarkers = hotSpots.filter((spot) => (this.markersFilter.findIndex((markerType) => markerType === spot.type || markerType === 'all') !== -1)).map((marker, markerIndex) => {
                 return {
                     ...marker,
                     markerIndex
@@ -163,12 +181,12 @@ export const MapController = (() => {
                     ...spot
                 })
             })
-            if(this.options.appendLegendsTo) this.createLegends(filteredMarkers)
+            if (this.options.appendLegendsTo) this.createLegends(filteredMarkers)
         }
 
         createLegends(legends) {
-            
-            if(!this.options.appendLegendsTo) return
+
+            if (!this.options.appendLegendsTo) return
             const categories = legends.map((legend) => {
                 return {
                     name: legend.categoryName || '',
@@ -185,69 +203,137 @@ export const MapController = (() => {
                 categoryColumn.classList.add('legends-list__item')
                 categoryColumn.innerHTML = `<span class="legends-list__category-name">${category.name || category.value}</span>`
 
-                const categoryDropDown = document.createElement('div')
-                categoryDropDown.classList.add('form-outline', 'form-outline--text-line', 'form-outline--icon-right')
-                categoryDropDown.dataset.dropDownSelect = true
-                categoryDropDown.dataset.dropdownSelectSwitches = true
-                categoryDropDown.innerHTML = `<input class="legends-list__filter-input form-outline__input form-control form-select form-solo" value="" placeholder="Search" data-toggle="dropdown-toggle" autocomplete="off"><i class="material-icons">expand_more</i>`
-
-                const categoryList = document.createElement('ul')
-                categoryList.classList.add('legends-list', 'legends-list--inner', 'dropdown-menu', 'dropdown-menu--select-options')
-                legends.filter((legend) => legend.type === category.value).forEach((filteredLegend) => {
-                    categoryList.appendChild(this.createLegend({
-                        ...filteredLegend
-                    }))
-                })
-
-                categoryDropDown.appendChild(categoryList)
+                const categoryDropDown = this.createDropdowns(legends.filter((legend) => legend.type === category.value), {placeholder: this.locale['Search'] || 'Search', selectSwitches: true})
+                
                 categoryColumn.appendChild(categoryDropDown)
                 legendList.appendChild(categoryColumn)
-                new SelectDropdown(categoryDropDown)
             })
 
 
             this.options.appendLegendsTo.appendChild(legendList)
-            
+
         }
 
-        createLegend(legend) {
+        createDropdowns(dropdownItems, { placeholder, selectSwitches }) {
+            const categoryDropDown = document.createElement('div')
+            categoryDropDown.classList.add('form-outline', 'form-outline--text-line', 'form-outline--icon-right')
+            categoryDropDown.dataset.dropDownSelect = true
+            if(selectSwitches) categoryDropDown.dataset.dropdownSelectSwitches = true
+            categoryDropDown.innerHTML = `<input class="legends-list__filter-input form-outline__input form-control form-select form-solo" value="" placeholder="${placeholder}" data-toggle="dropdown-toggle" autocomplete="off"><i class="material-icons">expand_more</i>`
+
+            const categoryList = document.createElement('ul')
+            categoryList.classList.add('legends-list', 'legends-list--inner', 'dropdown-menu', 'dropdown-menu--select-options')
+            dropdownItems.forEach((item) => {
+                categoryList.appendChild(this.createDropdownItem({
+                    ...item
+                }, () => this.Map.selectMarker(item.markerIndex)))
+            })
+
+            categoryDropDown.appendChild(categoryList)
+            new SelectDropdown(categoryDropDown)
+            return categoryDropDown
+        }
+
+        createDropdownItem(item, onClickFB) {
             const legendItem = document.createElement('li')
             legendItem.classList.add('legends-list__item', 'dropdown-item')
-            legendItem.dataset.label = `${legend.name}`
-            legendItem.dataset.value = `${legend.type}`
-            legendItem.innerHTML= `<span class="legends-list__legend-name">${legend.name}</span>`
-            legendItem.addEventListener('click', () => {
-                this.Map.selectMarker(legend.markerIndex)
-            })
+            legendItem.dataset.label = `${item.name}`
+            legendItem.dataset.value = `${item.value || item.type}`
+            legendItem.innerHTML = `<span class="legends-list__legend-name">${item.name}</span>`
+            if(typeof onClickFB === 'function') {
+                legendItem.addEventListener('click', () => {
+                    onClickFB()
+                })
+            }
+            
             return legendItem
+        }
+
+        // Navigation
+        createNavigation() {
+            if (!this.options.appendNavigationTo) return
+            const navigationContainer = this.options.appendNavigationTo
+            navigationContainer.innerHTML = ``
+            this.navigationPanel = null
+            this.navigationPanel = document.createElement('div')
+            this.navigationPanel.classList.add('map-navigation-panel')
+            this.navigationPanel.appendChild(this.createNavigationUI())
+
+            navigationContainer.appendChild(this.navigationPanel)
+
+        }
+
+        createNavigationUI() {
+            const navigationDiv = document.createElement('div')
+            navigationDiv.classList.add('map-navigation-panel__row')
+            navigationDiv.innerHTML = `<span class="map-navigation-panel__col map-navigation-panel__col--title">${this.locale["Navigation"] || ''}</span>`
+            
+            const originCol = document.createElement('div')
+            originCol.innerHTML = `<span>${this.locale["Origin"] || 'Origin'}</span>`
+            originCol.classList.add('map-navigation-panel__col')
+            const destinationCol = document.createElement('div')
+            destinationCol.innerHTML = `<span>${this.locale["Destination"] || 'Destination'}</span>`
+            destinationCol.classList.add('map-navigation-panel__col')
+            const actionCol = document.createElement('div')
+            actionCol.classList.add('map-navigation-panel__col', 'map-navigation-panel__col--action')
+
+            const originField = this.createTextField(this.activeSpot, { readOnly: true })
+            originCol.appendChild(originField)
+            navigationDiv.appendChild(originCol)
+
+            const markers = this.markers.filter((marker) => marker.name !== this.activeSpot.name).map(({name, value}) => {
+                return {
+                    name,
+                    value: value || name
+                }
+            })
+            const destinationField = this.createDropdowns(markers, {placeholder: this.locale['Search'] || 'Search'})
+            destinationCol.appendChild(destinationField)
+            navigationDiv.appendChild(destinationCol)
+
+            const navigateBtn = document.createElement('span')
+            navigateBtn.classList.add('btn', 'btn-outline-dark')
+            navigateBtn.innerHTML = `${this.locale["Navigate"] || 'Navigate'}`
+            actionCol.appendChild(navigateBtn)
+            navigationDiv.appendChild(actionCol)
+            
+            return navigationDiv
+        }
+
+        createTextField(spot, options) {
+            
+            const formOutline = document.createElement('div')
+            formOutline.classList.add('form-outline', 'form-outline--text-line', 'form-outline--icon-right')
+            formOutline.innerHTML = `<input class="form-outline__input form-control form-solo" ${options.readOnly ? ' readOnly="true" ' : ''} value="${spot.name}" placeholder="Origin" autocomplete="off">`
+            return formOutline
         }
 
         // Update filter options
         updateFilterOptions() {
-            if(!this.options.markersFilterElement) {
+            if (!this.options.markersFilterElement) {
                 this.markersFilter = ['all']
                 return
             }
             const inputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input')
             const checkedValues = []
             inputs.forEach((input) => {
-                if(input.checked) checkedValues.push(input.value)
+                if (input.checked) checkedValues.push(input.value)
             })
             this.markersFilter = checkedValues
 
             const markersFilterInput = this.options.markersFilterElement?.querySelector('.map-filter__input')
-            if(checkedValues.findIndex((val) => val === 'all') !== -1) {
+            if (checkedValues.findIndex((val) => val === 'all') !== -1) {
                 markersFilterInput.value = ''
                 return
             }
-            if(markersFilterInput) markersFilterInput.value = checkedValues.filter((val) => val !== 'all').join(', ')
+            if (markersFilterInput) markersFilterInput.value = checkedValues.filter((val) => val !== 'all').join(', ')
         }
 
         // Modal detail functions
         showModal(show) {
             this.spotsDetailModalActive = show
             this.spotsDetailModalActive ? this.spotDetailsModal.classList.add(`${this.options.classPrepend}-modal--show`) :
-            this.spotDetailsModal.classList.remove(`${this.options.classPrepend}-modal--show`)
+                this.spotDetailsModal.classList.remove(`${this.options.classPrepend}-modal--show`)
         }
 
         updateModal() {
@@ -270,7 +356,7 @@ export const MapController = (() => {
             if (!isEmptyOrSpaces(`${spot.link}`)) {
                 $link.style.display = "inline-flex";
                 $link.setAttribute('href', `${spot.link}`)
-                $link.innerHTML = spot.linkTitle ?  `${spot.linkTitle}` : this.locale["Go to"]
+                $link.innerHTML = spot.linkTitle ? `${spot.linkTitle}` : this.locale["Go to"]
             }
             else {
                 $link.style.display = "none";
@@ -281,10 +367,10 @@ export const MapController = (() => {
 
         // Overlay image loader
         async loadOverlayImages() {
-            if(!this.groundOverlays.length) return
-            
-            return Promise.all( this.groundOverlays.map(async (GO) => utilities.loadImage(GO.overlay)))
-            
+            if (!this.groundOverlays.length) return
+
+            return Promise.all(this.groundOverlays.map(async (GO) => utilities.loadImage(GO.overlay)))
+
         }
 
         // Featured Spot image
@@ -292,8 +378,8 @@ export const MapController = (() => {
             const $image = $imagePanel || this.spotDetailsModal.querySelector(`.${this.options.classPrepend}-modal__featured-image`)
             const imgSrc = src || this.activeSpot["image"]
             $image.classList.remove('d-none')
-            if(!imgSrc) {
-                
+            if (!imgSrc) {
+
                 $image.classList.add('d-none')
                 return
             }
@@ -318,16 +404,16 @@ export const MapController = (() => {
             this.updateModal()
         }
 
-        
+
 
         // Set ground overlays
         updateGroundOverlay() {
-            if(!this.Map) return
+            if (!this.Map) return
             this.Map.removeGroundOverlays()
             const mainOverlays = this.mainOverlaySetter()
-            if(!mainOverlays.length) return
+            if (!mainOverlays.length) return
             mainOverlays.forEach((item) => this.Map.setGroundOverlay(item.coordinates, item.overlay))
-            
+
         }
 
         mainOverlaySetter() {
@@ -343,10 +429,10 @@ export const MapController = (() => {
         // Loaders
         mainLoaders() {
             let mainLoader = this.container.querySelector(`.${this.options.classPrepend}__loader`)
-            if(mainLoader) mainLoader.remove()
+            if (mainLoader) mainLoader.remove()
             this.container.classList.remove(`${this.options.classPrepend}--loading`)
             this.options.markersFilterElement?.classList.remove(`loading-map`)
-            if(!this.mapLoading)  return
+            if (!this.mapLoading) return
 
             this.container.classList.add(`${this.options.classPrepend}--loading`)
             this.options.markersFilterElement?.classList.add(`loading-map`)
@@ -363,6 +449,7 @@ export const MapController = (() => {
             this.activeSpot = value
             this.Map.mapPanTo(marker)
             this.updateHTML()
+            this.createNavigation()
             //if (!this.spotsDetailModalActive) this.showModal(true)
         }
 

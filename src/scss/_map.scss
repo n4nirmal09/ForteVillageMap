@@ -184,3 +184,27 @@ $modal-content-padding: 15px;
         padding-right: 15px;
     }
 }
+
+.map-navigation-panel {
+    &__row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    &__col {
+        padding-left: 15px;
+        padding-right: 15px;
+        flex: 0 0 20%;
+
+        &--title {
+            flex: 0 0 100%;
+        }
+
+        &--action {
+            align-self: flex-end;
+        }
+    }
+    
+}

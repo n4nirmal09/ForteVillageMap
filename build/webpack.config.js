@@ -271,7 +271,7 @@ module.exports = env => {
                 template: 'views/index.pug',
                 inject: 'body'
             }),
-            ...utils.pages(env),
+            //...utils.pages(env),
             // ...utils.pages(env,'headers'),
             // ...utils.pages(env,'components'),
             // ...utils.pages(env,'forms'),

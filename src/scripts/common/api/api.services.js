@@ -29,7 +29,7 @@ export const API = (() => {
             return $.get(url, (data, status) => data)
         }
 
-        async getFetch(url) {
+        async getFetch(url, raw=false) {
             let token = ''
             
             const res = await fetch(url, {
@@ -38,7 +38,8 @@ export const API = (() => {
                     'Authorization': `Bearer ${token?.["access_token"] || ''}`
                 }
             })
-            return res.json()
+            if(!raw) return res.json()
+            return res
         }
 
         async post(url, data) {

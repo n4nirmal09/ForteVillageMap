@@ -92,10 +92,14 @@ block content
         disableDefaultUI: true,
         zoomControl: true
       }, 
-      data-locale={"Go to": "vai al sito", "Close" : "vicino"},
+      data-locale={"Go to": "vai al sito", "Close" : "vicino", "Search": "Search", "Navigation": "Navigation title"},
       data-filter-link="#forte-map-filter"
       data-append-legends-to="#forte-map-legends"
+      data-append-navigation-to="#map-navigation",
+      data-roads = "./js/data/roads.json"
       )
+  .container 
+    div#map-navigation
   .container 
     .d-flex 
       .col-auto
