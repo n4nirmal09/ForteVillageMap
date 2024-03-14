@@ -418,7 +418,7 @@ export const MapController = (() => {
 
         mainOverlaySetter() {
             const zoomLevel = this.Map.getMap().getZoom()
-            let mainOverlays = this.groundOverlays.filter((overlaySet) => zoomLevel >= overlaySet.zoomLevel)
+            let mainOverlays = this.groundOverlays.filter((overlaySet) => (zoomLevel >= overlaySet.zoomLevel) &&  (!overlaySet.maxZoomLevel || zoomLevel < overlaySet.maxZoomLevel) )
             // this.groundOverlays.forEach((overlaySet) => {
             //     if(zoomLevel >= overlaySet.zoomLevel) mainOverlay = overlaySet
             // })
