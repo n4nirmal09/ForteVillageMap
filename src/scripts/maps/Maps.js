@@ -26,6 +26,7 @@ export const MapController = (() => {
             this.markersFilter = ['all']
             this.roadsURL = this.container.dataset.roads || null
             this.roads = []
+            this.roadNavigationMode = false
             this.modal = false
             this.inlineMapOptions = this.APIServices.isJson(this.container.dataset.mapOptions) ? JSON.parse(this.container.dataset.mapOptions) : {}
             this.locale = this.APIServices.isJson(this.container.dataset.locale) ? JSON.parse(this.container.dataset.locale) : {
@@ -158,7 +159,7 @@ export const MapController = (() => {
             if (!this.APIServices.isJson(this.roadsURL)) {
                 return this.APIServices.getFetch(this.roadsURL)
                 .then((data) => {
-                    console.log(data)
+                    this.roads = data
                     return data
                 })
             }
@@ -250,16 +251,22 @@ export const MapController = (() => {
         }
 
         // Navigation
-        createNavigation() {
-            if (!this.options.appendNavigationTo) return
+        clearNavigation() {
             const navigationContainer = this.options.appendNavigationTo
             navigationContainer.innerHTML = ``
             this.navigationPanel = null
+        }
+        createNavigation() {
+            if (!this.options.appendNavigationTo) return
+            
+            this.clearNavigation()
+            const navigationContainer = this.options.appendNavigationTo
             this.navigationPanel = document.createElement('div')
             this.navigationPanel.classList.add('map-navigation-panel')
             this.navigationPanel.appendChild(this.createNavigationUI())
-
+            
             navigationContainer.appendChild(this.navigationPanel)
+            this.updateNavigation()
 
         }
 
@@ -276,8 +283,11 @@ export const MapController = (() => {
             destinationCol.classList.add('map-navigation-panel__col')
             const actionCol = document.createElement('div')
             actionCol.classList.add('map-navigation-panel__col', 'map-navigation-panel__col--action')
+            const clearCol = document.createElement('div')
+            clearCol.classList.add('map-navigation-panel__col', 'map-navigation-panel__col--action')
 
             const originField = this.createTextField(this.activeSpot, { readOnly: true })
+            originField.classList.add('main-navigation__origin-field')
             originCol.appendChild(originField)
             navigationDiv.appendChild(originCol)
 
@@ -288,16 +298,74 @@ export const MapController = (() => {
                 }
             })
             const destinationField = this.createDropdowns(markers, {placeholder: this.locale['Search'] || 'Search'})
+            destinationField.classList.add('main-navigation__destination-field')
             destinationCol.appendChild(destinationField)
             navigationDiv.appendChild(destinationCol)
 
             const navigateBtn = document.createElement('span')
-            navigateBtn.classList.add('btn', 'btn-outline-dark')
+            navigateBtn.classList.add('btn', 'btn-outline-dark', 'btn--navigate')
             navigateBtn.innerHTML = `${this.locale["Navigate"] || 'Navigate'}`
             actionCol.appendChild(navigateBtn)
             navigationDiv.appendChild(actionCol)
+            navigateBtn.addEventListener("click", () => this.onNavigationClick())
+
+
+            const clearBtn = document.createElement('span')
+            clearBtn.classList.add('btn', 'btn-outline-dark', 'd-none', 'btn--clear')
+            clearBtn.innerHTML = `${this.locale["Clear"] || 'Clear'}`
+            clearCol.appendChild(clearBtn)
+            navigationDiv.appendChild(clearCol)
+            clearCol.addEventListener("click", () => this.onNavigationClear())
+            destinationField.addEventListener("selected", (e) => this.updateNavigation())
+            
+            
             
             return navigationDiv
+        }
+
+        updateNavigation() {
+            const origin = this.navigationPanel.querySelector('.main-navigation__origin-field input')
+            const destination = this.navigationPanel.querySelector('.main-navigation__destination-field input')
+            const navigateBtn = this.navigationPanel.querySelector('.btn--navigate')
+            const clearBtn = this.navigationPanel.querySelector('.btn--clear')
+            const originIndex = this.markers.findIndex((marker) => marker.name === origin.value)
+            const destinationIndex = this.markers.findIndex((marker) => marker.name === destination.value)
+            if(destinationIndex !== -1 && originIndex !== -1) {
+                navigateBtn.classList.remove('disabled')
+            } else {
+                navigateBtn.classList.add('disabled')
+            }
+            
+            if(this.groundOverlays.findIndex((ov) => ov.type == "road") !== -1) {
+                clearBtn.classList.remove('d-none')
+            } else {
+                clearBtn.classList.add('d-none')
+            }
+        }
+
+        onNavigationClick() {
+            const origin = this.navigationPanel.querySelector('.main-navigation__origin-field input')
+            const destination = this.navigationPanel.querySelector('.main-navigation__destination-field')
+            
+            const roadOverlay = this.roads.find((road) => road.origin === origin.value && road.destination === destination.getValue().value)
+            if(roadOverlay) {
+                this.Map.getMap().setZoom(this.options.mapOptions.zoom)
+                this.roadNavigationMode = true
+                this.removeAllRoadOverlays()
+                this.groundOverlays.push(roadOverlay.image)
+                this.unCheckAllFilters()
+                this.updateGroundOverlay()
+                this.updateNavigation()
+            }
+            
+        }
+
+        onNavigationClear() {
+            if(!this.navigationPanel) return
+            this.clearNavigation()
+            this.roadNavigationMode = false
+            this.updateGroundOverlay()
+            this.unCheckAllFilters('all')
         }
 
         createTextField(spot, options) {
@@ -418,12 +486,17 @@ export const MapController = (() => {
 
         mainOverlaySetter() {
             const zoomLevel = this.Map.getMap().getZoom()
+            if(!this.roadNavigationMode) this.removeAllRoadOverlays()
             let mainOverlays = this.groundOverlays.filter((overlaySet) => (zoomLevel >= overlaySet.zoomLevel) &&  (!overlaySet.maxZoomLevel || zoomLevel < overlaySet.maxZoomLevel) )
             // this.groundOverlays.forEach((overlaySet) => {
             //     if(zoomLevel >= overlaySet.zoomLevel) mainOverlay = overlaySet
             // })
 
             return mainOverlays
+        }
+
+        removeAllRoadOverlays() {
+            this.groundOverlays = this.groundOverlays.filter((overlay) => overlay.type !== 'road')
         }
 
         // Loaders
@@ -440,6 +513,20 @@ export const MapController = (() => {
             mainLoader.classList.add(`${this.options.classPrepend}__loader`)
             mainLoader.innerHTML = `<span class="spinner"><span class="spinner-border"><span class="sr-only">loading ...</span></span></span>`
             this.container.appendChild(mainLoader)
+        }
+
+        unCheckAllFilters(exception) {
+            const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input') || []
+            filterInputs.forEach((inp) => {
+                if(inp.checked) {
+                    inp.checked = false
+                    inp.dispatchEvent(new Event('change'));
+                }
+                if(inp.value === exception) {
+                    inp.checked = true
+                    inp.dispatchEvent(new Event('change'));
+                }
+            })
         }
 
         // Callbacks

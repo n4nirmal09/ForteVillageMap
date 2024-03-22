@@ -20,7 +20,7 @@ module.exports = {
 	build: {
 		assetsRoot: path.resolve(__dirname, '../dist'),
 		assetsSubDirectory: '',
-		assetsPublicPath: '/wp-content/themes/fvr/maptest/',
+		assetsPublicPath: './',
 		sourceMap: false,
 		devtool: 'source-map',
 	}

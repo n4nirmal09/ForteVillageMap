@@ -185,8 +185,6 @@ export default class GMap {
 
         this.groundOverlays = []
 
-        console.log(this.groundOverlays)
-
         
     }
 

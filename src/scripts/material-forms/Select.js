@@ -23,6 +23,7 @@ export class SelectDropdown extends Dropdown.DropdownMain {
         this._addEVentListeners()
         this.updateSelected()
         this._initMenu()
+        this.container.getValue = () => this.selectedValue
         this.container.getSelectDropDown = () => this
     }
 

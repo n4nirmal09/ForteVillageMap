@@ -70,7 +70,12 @@ block content
         data-ground-overlays=[
         {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
         "zoomLevel": 16,
+        "maxZoomLevel": 18,
         "overlay": "images/MAPNEWNEWNEW.jpg"},
+        {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
+        "zoomLevel": 18,
+        "overlay": "images/Offset-2.png"
+        },
         {"coordinates":{"S": 38.92836424033743, "W": 8.92, "N": 38.94287213966831, "E": 8.924896661531204}, 
         "zoomLevel": 16,
         "overlay": "images/Offset-2.png"
@@ -79,7 +84,7 @@ block content
         zoom: 16, 
         center: { lat:  38.93240924257542, lng: 8.931271334750678},
         minZoom: 16,
-        maxZoom: 19,
+        maxZoom: 20,
         restriction: {
           latLngBounds: {
             north: 38.94287213966831,
@@ -243,7 +248,7 @@ block scripts
         window.localStorage.removeItem(key)
       }
 
-      mapOptionsTextArea.addEventListener('input', debounce(updatePreviewEditor, 250, false))
-      overlayOptionsTextArea.addEventListener('input', debounce(updatePreviewEditor, 250, false))
+      mapOptionsTextArea.addEventListener('input', debounce(updatePreviewEditor, 500, false))
+      overlayOptionsTextArea.addEventListener('input', debounce(updatePreviewEditor, 500, false))
 
     }
