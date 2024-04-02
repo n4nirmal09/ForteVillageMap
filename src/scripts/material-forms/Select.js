@@ -116,6 +116,10 @@ export class SelectDropdown extends Dropdown.DropdownMain {
         
     }
 
+    destroy() {
+        document.removeEventListener("click", this.bindDocumentClick)
+    }
+
     _addEVentListeners() {
         if (this.trigger instanceof HTMLInputElement) {
             this.trigger.addEventListener('focus', (e) => !this.show && this.openPanel())
@@ -138,12 +142,13 @@ export class SelectDropdown extends Dropdown.DropdownMain {
         })
 
         // Nulling on document click
-        document.addEventListener('click', (event) => {
+        this.bindDocumentClick = (evt) => {
             const preventDropdownClose = document.body.classList.contains('prevent-dropdown-close')
             if(preventDropdownClose) return
             const isClickInside = this.container.contains(event.target) || this.menu.contains(event.target)
             !isClickInside && this.show && this.closePanel()
-        })
+        }
+        document.addEventListener('click', this.bindDocumentClick)
         this.container.addEventListener('selected', (e) => this.onSelect(e))
 
         // Search input

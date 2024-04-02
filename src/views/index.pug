@@ -97,11 +97,14 @@ block content
         disableDefaultUI: true,
         zoomControl: true
       }, 
-      data-locale={"Go to": "vai al sito", "Close" : "vicino", "Search": "Search", "Navigation": "Navigation title"},
+      data-locale={"Go to": "vai al sito", "Close" : "vicino", "Search": "Search", "Navigation": "Navigation title", "No origin selected": "No origin selected"},
       data-filter-link="#forte-map-filter"
       data-append-legends-to="#forte-map-legends"
       data-append-navigation-to="#map-navigation",
-      data-roads = "./js/data/roads.json"
+      data-roads = "./js/data/roads.json",
+      data-options={
+        "disableAllMarkersOnNavigationSelect": false
+      }
       )
   .container 
     div#map-navigation
@@ -121,6 +124,16 @@ block content
       .aspect-ratio__inner-content#map-preview
     p.mt-2 HTML Code Preview
     pre#map-html-preview.mt-2
+
+
+  .container 
+    h2 Editor tool 
+    #inputFields
+    div
+      button.btn(onclick="addOverlay()") Add Overlay
+      button.btn(onclick="saveOverlay()") Save Overlay
+      button.btn(onclick="addGroundOverlayObj()") Generate from ground overlay ontop
+    pre#preview
 block footer
   footer footer
 block scripts 
@@ -161,7 +174,6 @@ block scripts
         "zoomLevel": 16,
         "overlay": "./images/Offset-2.png"
         },
-
       ]
 
       updateInputAreas();
@@ -251,4 +263,128 @@ block scripts
       mapOptionsTextArea.addEventListener('input', debounce(updatePreviewEditor, 500, false))
       overlayOptionsTextArea.addEventListener('input', debounce(updatePreviewEditor, 500, false))
 
+    }
+
+
+
+    let overlayObjects = [];
+    // Function to create input fields for one object
+    function createOverlayInputFields(objects) {
+        const container = document.getElementById('inputFields');
+        
+        // Clear the container's inner HTML
+        container.innerHTML = '';
+
+        // Iterate over each object in the overlayObjects array
+        objects.forEach((object, index) => {
+            const inputSection = document.createElement('div');
+            inputSection.style.padding = '20px';
+            inputSection.style.border = '1px solid';
+
+            for (const key in object) {
+                const label = document.createElement('label');
+                label.classList.add('d-block');
+                label.style.marginBottom = '10px';
+                const input = document.createElement('input');
+                input.classList.add('d-block');
+                input.setAttribute('type', 'text');
+                input.style.marginBottom = '10px';
+
+                if (typeof object[key] === 'object') {
+                    for (const subKey in object[key]) {
+                        const subLabel = document.createElement('label');
+                        subLabel.innerHTML = `${key}.${subKey}`;
+                        const subInput = document.createElement('input');
+                        subInput.setAttribute('type', 'text');
+                        subInput.setAttribute('placeholder', `${key}.${subKey}`);
+                        subInput.value = object[key][subKey];
+                        inputSection.appendChild(subLabel);
+                        inputSection.appendChild(subInput);
+                    }
+                } else {
+                    input.setAttribute('placeholder', key);
+                    input.value = object[key];
+                    label.innerHTML = `${key}`;
+                    inputSection.appendChild(label);
+                    inputSection.appendChild(input);
+                }
+            }
+
+            // Append the input section to the container
+            container.appendChild(inputSection);
+        });
+    }
+
+    // Function to add a new object
+    function addOverlay(obj = null) {
+        if(!obj) {
+          overlayObjects.push({"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
+          "zoomLevel": 16,
+          "maxZoomLevel": 18,
+          "overlay": "./images/MAPNEWNEWNEW.jpg"}
+          );
+        } else {
+          overlayObjects.push(obj)
+        }
+        
+        createOverlayInputFields(overlayObjects);
+    }
+
+    function addGroundOverlayObj() {
+      const overlayTextAreaValue = document.querySelector('#overlay-options-text').value.trim()
+      overlayObjects = [];
+      try{
+        const correctedJSON = overlayTextAreaValue.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2": ');
+        const parsedJson = JSON.parse(correctedJSON)
+        overlayObjects = parsedJson
+      }catch(err) {
+        console.log(err)
+      }
+      createOverlayInputFields(overlayObjects);
+    }
+
+    // Function to save objects
+    function saveOverlay() {
+      const preview = document.getElementById('preview');
+      
+      // Array to store the overlay objects
+      const overlayObjects = [];
+      
+      // Get all input sections
+      const inputSections = document.querySelectorAll('#inputFields > div');
+
+      // Iterate over each input section
+      inputSections.forEach((inputSection, index) => {
+          const overlayObject = {};
+          
+          // Get all input fields within the current input section
+          const inputs = inputSection.querySelectorAll('input');
+
+          // Iterate over each input field
+          inputs.forEach((input) => {
+              const key = input.getAttribute('placeholder');
+              const value = input.value;
+              
+              // Skip empty values
+              if (value.trim() !== '') {
+                  // Split the key into its parts (if applicable)
+                  const keys = key.split('.');
+                  
+                  // Construct the object using the key parts
+                  let currentObject = overlayObject;
+                  for (let i = 0; i < keys.length - 1; i++) {
+                      const k = keys[i];
+                      currentObject[k] = currentObject[k] || {};
+                      currentObject = currentObject[k];
+                  }
+                  currentObject[keys[keys.length - 1]] = value;
+              }
+          });
+          
+          // Add the constructed overlay object to the array
+          overlayObjects.push(overlayObject);
+      });
+      
+      // Display the generated JSON string in the preview div
+      preview.innerHTML = JSON.stringify(overlayObjects, null, 2);
     }

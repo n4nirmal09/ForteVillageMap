@@ -22,6 +22,7 @@ export default class GMap {
         this.MapLoader = null
         this.googleMapLoaderOptions = loaderOptions || {}
         this.editorMode = !!this.$map.dataset.editorMode  || false
+        this.infoPopup = false
         this.zoomTimer = null
         this.setupOptions = {
             center: { lat: 38.932583, lng: 8.932833 },
@@ -138,7 +139,7 @@ export default class GMap {
         })
         marker.setMap(this.Map)
         marker.addListener("click", () => this.markerClick(marker))
-        marker.infoWindow = this.createInfoWindow(marker.details)
+        if(this.infoPopup) marker.infoWindow = this.createInfoWindow(marker.details)
         this.markers.push(marker)
         return marker
 
@@ -148,7 +149,7 @@ export default class GMap {
         this.selectedMarker = null
         this.markers.forEach((marker) => {
             marker.setMap(null)
-            marker.infoWindow?.close()
+            if(this.infoPopup) marker.infoWindow?.close()
         })
         this.markers = []
     }

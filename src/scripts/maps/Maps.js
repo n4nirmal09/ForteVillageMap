@@ -53,6 +53,8 @@ export const MapController = (() => {
                     styles: '',
                     ...this.inlineMapOptions
                 },
+                disableAllMarkersOnNavigationSelect: false,
+                slidingModal: true,
                 stylesURL: this.container.dataset.mapStyles || null,
                 classPrepend: 'interactive-map',
                 markersFilterElement: document.querySelector(this.container.dataset.filterLink),
@@ -60,7 +62,8 @@ export const MapController = (() => {
                 appendNavigationTo: this.container.dataset.appendNavigationTo ? document.querySelector(this.container.dataset.appendNavigationTo) : null,
                 editorMode: false
             }, {
-                ...options
+                ...options,
+                ...(this.container.dataset.options ? JSON.parse(this.container.dataset.options) : {})
             })
 
             this.groundOverlays = this.container.dataset.groundOverlays ? JSON.parse(this.container.dataset.groundOverlays) : []
@@ -137,6 +140,7 @@ export const MapController = (() => {
 
             this.updateMarkers()
             this.updateGroundOverlay()
+            this.createNavigation()
         }
 
         //Markers
@@ -194,7 +198,10 @@ export const MapController = (() => {
                     value: legend.type
                 }
             })
-
+            const selectDropdownsPrev = this.options.appendLegendsTo.querySelectorAll('[data-drop-down-select]')
+            selectDropdownsPrev.forEach((sd) => {
+                sd.getSelectDropDown().destroy()
+            })
             this.options.appendLegendsTo.innerHTML = ``
             const legendList = document.createElement('ul')
             legendList.classList.add('legends-list')
@@ -253,6 +260,10 @@ export const MapController = (() => {
         // Navigation
         clearNavigation() {
             const navigationContainer = this.options.appendNavigationTo
+            const selectDropdowns = navigationContainer.querySelectorAll('[data-drop-down-select]')
+            selectDropdowns.forEach((sd) => {
+                sd.getSelectDropDown().destroy()
+            })
             navigationContainer.innerHTML = ``
             this.navigationPanel = null
         }
@@ -274,6 +285,25 @@ export const MapController = (() => {
             const navigationDiv = document.createElement('div')
             navigationDiv.classList.add('map-navigation-panel__row')
             navigationDiv.innerHTML = `<span class="map-navigation-panel__col map-navigation-panel__col--title">${this.locale["Navigation"] || ''}</span>`
+            if(!this.activeSpot) {
+                const originCol = document.createElement('div')
+                originCol.innerHTML = `<span>${this.locale["Origin"] || 'Origin'}</span>`
+                originCol.classList.add('map-navigation-panel__col')
+                const originField = this.createTextField({name: `${this.locale["No origin selected"] || 'No origin selected'}`}, { readOnly: true })
+                originField.classList.add('main-navigation__origin-field')
+                originCol.appendChild(originField)
+
+                const destinationCol = document.createElement('div')
+                destinationCol.innerHTML = `<span>${this.locale["Destination"] || 'Destination'}</span>`
+                destinationCol.classList.add('map-navigation-panel__col')
+                const destinationField = this.createTextField({name: "..."}, { readOnly: true })
+                destinationField.classList.add('main-navigation__destination-field')
+                destinationCol.appendChild(destinationField)
+
+                navigationDiv.appendChild(originCol)
+                navigationDiv.appendChild(destinationCol)
+                return navigationDiv
+            }
             
             const originCol = document.createElement('div')
             originCol.innerHTML = `<span>${this.locale["Origin"] || 'Origin'}</span>`
@@ -324,6 +354,7 @@ export const MapController = (() => {
         }
 
         updateNavigation() {
+            if(!this.activeSpot) return
             const origin = this.navigationPanel.querySelector('.main-navigation__origin-field input')
             const destination = this.navigationPanel.querySelector('.main-navigation__destination-field input')
             const navigateBtn = this.navigationPanel.querySelector('.btn--navigate')
@@ -349,11 +380,12 @@ export const MapController = (() => {
             
             const roadOverlay = this.roads.find((road) => road.origin === origin.value && road.destination === destination.getValue().value)
             if(roadOverlay) {
+                this.showModal(false)
                 this.Map.getMap().setZoom(this.options.mapOptions.zoom)
                 this.roadNavigationMode = true
                 this.removeAllRoadOverlays()
                 this.groundOverlays.push(roadOverlay.image)
-                this.unCheckAllFilters()
+                if(this.options.disableAllMarkersOnNavigationSelect) this.unCheckAllFilters()
                 this.updateGroundOverlay()
                 this.updateNavigation()
             }
@@ -362,10 +394,13 @@ export const MapController = (() => {
 
         onNavigationClear() {
             if(!this.navigationPanel) return
-            this.clearNavigation()
+            
             this.roadNavigationMode = false
+            this.activeSpot = null
+            this.createNavigation()
+            this.showModal(false)
             this.updateGroundOverlay()
-            this.unCheckAllFilters('all')
+            if(this.options.disableAllMarkersOnNavigationSelect) this.unCheckAllFilters('all')
         }
 
         createTextField(spot, options) {
@@ -537,7 +572,7 @@ export const MapController = (() => {
             this.Map.mapPanTo(marker)
             this.updateHTML()
             this.createNavigation()
-            //if (!this.spotsDetailModalActive) this.showModal(true)
+            if (!this.spotsDetailModalActive && this.options.slidingModal) this.showModal(true)
         }
 
         onMapZoom(e) {
