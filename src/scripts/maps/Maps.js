@@ -149,6 +149,7 @@ export const MapController = (() => {
             if (!this.markers || this.markers.length === 0) return
             if (!this.APIServices.isJson(this.markers)) {
                 this.markersLoading = true
+                
                 return this.APIServices.getFetch(this.markers)
                     .then((data) => {
                         this.markersLoading = false
@@ -156,6 +157,7 @@ export const MapController = (() => {
                         return this.markers
                     })
             }
+           
             return this.parseData(JSON.parse(this.markers))
         }
 
@@ -192,26 +194,62 @@ export const MapController = (() => {
         createLegends(legends) {
 
             if (!this.options.appendLegendsTo) return
-            const categories = legends.map((legend) => {
-                return {
-                    name: legend.categoryName || '',
-                    value: legend.type
+            
+            let categories = []
+            legends.forEach((item) => {
+                const catIndex = categories.findIndex((cat) => cat.value === item.type) 
+                if(catIndex === -1) {
+                    categories.push({
+                        name:  item.categoryName || item.type.split('-').join(' '),
+                        value: item.type 
+                    })
                 }
             })
-            const selectDropdownsPrev = this.options.appendLegendsTo.querySelectorAll('[data-drop-down-select]')
-            selectDropdownsPrev.forEach((sd) => {
+            
+            
+            
+            const dropdownListItems = this.options.appendLegendsTo.querySelectorAll('.legends-list__item-col:not(.legends-list__item-col--category)')
+            dropdownListItems.forEach((item) => {
+                const sd = item.querySelector('[data-drop-down-select]')
                 sd.getSelectDropDown().destroy()
+                item.remove()
             })
-            this.options.appendLegendsTo.innerHTML = ``
-            const legendList = document.createElement('ul')
-            legendList.classList.add('legends-list')
+            const dropdownListItemCategory = this.options.appendLegendsTo.querySelector('.legends-list__item-col--category')
+            if(!dropdownListItemCategory) {
+                this.options.appendLegendsTo.innerHTML = ``
+            }
+            
+            const legendList = !dropdownListItemCategory ? document.createElement('ul') : this.options.appendLegendsTo.querySelector('.legends-list')
+            if(!dropdownListItemCategory) legendList.classList.add('legends-list')
+
+            if(!dropdownListItemCategory) {
+                const categoryFilterColumn = document.createElement('li')
+                categoryFilterColumn.classList.add('legends-list__item', 'legends-list__item-col', 'legends-list__item-col--category')
+                categoryFilterColumn.innerHTML = `<span class="legends-list__category-name">${this.locale['Category'] || 'Category'}</span>`
+                const categoryFilterDropdown = this.createDropdowns([{name: this.locale['All'] || 'All', value:"all", checked: true}, ...categories], {placeholder: this.locale['Search'] || 'Search',
+                    selectSwitches: true, 
+                    legendFilter: true,
+                    inputModifiers: 'map-filter__input'
+                })
+                categoryFilterColumn.appendChild(categoryFilterDropdown)
+                legendList.appendChild(categoryFilterColumn)
+
+                const filterInputs = legendList?.querySelectorAll('.map-filter__item-input') || []
+                filterInputs.forEach((input) => {
+                    input.addEventListener('change', (e) => this.onFilterChange(e))
+                })
+            }
+            
 
             categories.forEach((category) => {
                 const categoryColumn = document.createElement('li')
-                categoryColumn.classList.add('legends-list__item')
+                categoryColumn.classList.add('legends-list__item', 'legends-list__item-col')
                 categoryColumn.innerHTML = `<span class="legends-list__category-name">${category.name || category.value}</span>`
 
-                const categoryDropDown = this.createDropdowns(legends.filter((legend) => legend.type === category.value), {placeholder: this.locale['Search'] || 'Search', selectSwitches: true})
+                const categoryDropDown = this.createDropdowns(legends.filter((legend) => legend.type === category.value), {placeholder: this.locale['Search'] || 'Search', 
+                    selectSwitches: true, 
+                    inputModifiers: 'legends-list__filter-input'
+                })
                 
                 categoryColumn.appendChild(categoryDropDown)
                 legendList.appendChild(categoryColumn)
@@ -222,19 +260,22 @@ export const MapController = (() => {
 
         }
 
-        createDropdowns(dropdownItems, { placeholder, selectSwitches }) {
+        createDropdowns(dropdownItems, { placeholder, selectSwitches, legendFilter, inputModifiers }) {
             const categoryDropDown = document.createElement('div')
             categoryDropDown.classList.add('form-outline', 'form-outline--text-line', 'form-outline--icon-right')
+
             categoryDropDown.dataset.dropDownSelect = true
             if(selectSwitches) categoryDropDown.dataset.dropdownSelectSwitches = true
-            categoryDropDown.innerHTML = `<input class="legends-list__filter-input form-outline__input form-control form-select form-solo" value="" placeholder="${placeholder}" data-toggle="dropdown-toggle" autocomplete="off"><i class="material-icons">expand_more</i>`
+            categoryDropDown.innerHTML = `<input class="${inputModifiers} form-outline__input form-control form-select form-solo" value="" placeholder="${placeholder}" data-toggle="dropdown-toggle" autocomplete="off"><i class="material-icons">expand_more</i>`
 
             const categoryList = document.createElement('ul')
             categoryList.classList.add('legends-list', 'legends-list--inner', 'dropdown-menu', 'dropdown-menu--select-options')
             dropdownItems.forEach((item) => {
                 categoryList.appendChild(this.createDropdownItem({
                     ...item
-                }, () => this.Map.selectMarker(item.markerIndex)))
+                }, () => {
+                    if(!legendFilter) this.Map.selectMarker(item.markerIndex)
+                }, legendFilter))
             })
 
             categoryDropDown.appendChild(categoryList)
@@ -242,11 +283,16 @@ export const MapController = (() => {
             return categoryDropDown
         }
 
-        createDropdownItem(item, onClickFB) {
+        createDropdownItem(item, onClickFB, inputCheckBox = false) {
             const legendItem = document.createElement('li')
             legendItem.classList.add('legends-list__item', 'dropdown-item')
             legendItem.dataset.label = `${item.name}`
             legendItem.dataset.value = `${item.value || item.type}`
+            if(inputCheckBox) {
+                legendItem.innerHTML = `<input class="map-filter__item-input" type="checkbox" name="map-filter" id="map-filter-${item.value}" value="${item.value}" ${item.checked ? 'checked' : ''} >`
+                legendItem.innerHTML += `<label class="map-filter__item-label" for="map-filter-${item.value}">${item.name}</label>`
+                return legendItem
+            }
             legendItem.innerHTML = `<span class="legends-list__legend-name">${item.name}</span>`
             if(typeof onClickFB === 'function') {
                 legendItem.addEventListener('click', () => {
@@ -413,18 +459,19 @@ export const MapController = (() => {
 
         // Update filter options
         updateFilterOptions() {
-            if (!this.options.markersFilterElement) {
+            const filterElement = this.options.markersFilterElement || this.options.appendLegendsTo?.querySelector('.legends-list__item-col--category') || null
+            if (!filterElement) {
                 this.markersFilter = ['all']
                 return
             }
-            const inputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input')
+            const inputs = filterElement?.querySelectorAll('.map-filter__item-input')
             const checkedValues = []
             inputs.forEach((input) => {
                 if (input.checked) checkedValues.push(input.value)
             })
             this.markersFilter = checkedValues
 
-            const markersFilterInput = this.options.markersFilterElement?.querySelector('.map-filter__input')
+            const markersFilterInput = filterElement?.querySelector('.map-filter__input')
             if (checkedValues.findIndex((val) => val === 'all') !== -1) {
                 markersFilterInput.value = ''
                 return
@@ -551,7 +598,7 @@ export const MapController = (() => {
         }
 
         unCheckAllFilters(exception) {
-            const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input') || []
+            const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input') || this.options.appendLegendsTo?.querySelector('.legends-list__item-col--category') || []
             filterInputs.forEach((inp) => {
                 if(inp.checked) {
                     inp.checked = false

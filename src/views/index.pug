@@ -5,17 +5,17 @@ block header
 block content
   div.container
     .main-filter-list 
-      .main-filter-list__item
-          div.d-flex
-            span.flex-1 Category  
-          #forte-map-filter.form-outline(class="form-outline--text-line form-outline--icon-right", data-dropdown-select=true, data-dropdown-select-switches="true")
-            input.map-filter__input.form-outline__input.form-control(value= '', class='form-select form-solo',  placeholder = 'Search', data-toggle='dropdown-toggle',  autocomplete="off")
-            i.material-icons expand_more
-            .dropdown-menu.dropdown-menu--select-options(aria-labelledby='select-dropdown')
-              each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}, {"name": "Resort", "value": "resort"}]
-                .dropdown-item(data-selected=false, data-value=i.value data-label=i.name)
-                  input.map-filter__item-input(type="checkbox" name="map-filter", value=i.value, checked = i.selected) 
-                  label.map-filter__item-label !{i.name}
+      //- .main-filter-list__item
+      //-     div.d-flex
+      //-       span.flex-1 Category  
+      //-     #forte-map-filter.form-outline(class="form-outline--text-line form-outline--icon-right", data-dropdown-select=true, data-dropdown-select-switches="true")
+      //-       input.map-filter__input.form-outline__input.form-control(value= '', class='form-select form-solo',  placeholder = 'Search', data-toggle='dropdown-toggle',  autocomplete="off")
+      //-       i.material-icons expand_more
+      //-       .dropdown-menu.dropdown-menu--select-options(aria-labelledby='select-dropdown')
+      //-         each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Restuarants", "value": "restaurants-bars"}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}, {"name": "Resort", "value": "resort"}]
+      //-           .dropdown-item(data-selected=false, data-value=i.value data-label=i.name)
+      //-             input.map-filter__item-input(type="checkbox" name="map-filter", value=i.value, checked = i.selected) 
+      //-             label.map-filter__item-label !{i.name}
 
           //- div.d-flex(role='button' data-toggle='dropdown', aria-haspopup='true' aria-expanded='false')
           //-   span.flex-1 Category dropdown 
@@ -66,7 +66,7 @@ block content
 
     .aspect-ratio--16x9 
       .aspect-ratio__inner-content 
-        div.forte-map.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/hotspots.json", 
+        div.forte-map.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/markers.json", 
         data-ground-overlays=[
         {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
         "zoomLevel": 16,
@@ -98,7 +98,7 @@ block content
         zoomControl: true
       }, 
       data-locale={"Go to": "vai al sito", "Close" : "vicino", "Search": "Search", "Navigation": "Navigation title", "No origin selected": "No origin selected"},
-      data-filter-link="#forte-map-filter"
+      
       data-append-legends-to="#forte-map-legends"
       data-append-navigation-to="#map-navigation",
       data-roads = "./js/data/roads.json",

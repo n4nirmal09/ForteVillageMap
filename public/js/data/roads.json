@@ -19,5 +19,16 @@
             "overlay": "images/roads/2.png",
             "type": "road"
         } 
+    },
+    {
+        "origin": "Piazza Luisa Bar",
+        "destination": "Oasis Pool Bar ",
+        "road": "1.png",
+        "image": {
+            "coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721},
+            "zoomLevel": 16,
+            "overlay": "images/roads/2.png",
+            "type": "road"
+        } 
     }
 ]

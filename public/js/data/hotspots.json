@@ -8,6 +8,7 @@
         "type": "hotel",
         "link": "null",
         "icon": "./images/logo-symbol.svg",
+        "iconActive": "./images/logo-symbol-active.svg",
         "label": "Fortevillage hotel castello",
         "description": "<p>Poda dolor Lorem minim amet culpa amet. Voluptate irure dolore incididunt aliquip sunt excepteur pariatur sit. Lorem labore ea est qui nulla esse Lorem.</p> <p><a class='' href='#'>Link</a></p>"
     },
