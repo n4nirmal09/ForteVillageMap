@@ -50,6 +50,7 @@ export const MapController = (() => {
                     minZoom: 18,
                     disableDefaultUI: true,
                     zoomControl: true,
+                    navigationModeZoom: 18,
                     styles: '',
                     ...this.inlineMapOptions
                 },
@@ -427,7 +428,7 @@ export const MapController = (() => {
             const roadOverlay = this.roads.find((road) => road.origin === origin.value && road.destination === destination.getValue().value)
             if(roadOverlay) {
                 this.showModal(false)
-                this.Map.getMap().setZoom(this.options.mapOptions.zoom)
+                this.Map.getMap().setZoom(this.options.mapOptions.navigationModeZoom || this.options.mapOptions.zoom)
                 this.roadNavigationMode = true
                 this.removeAllRoadOverlays()
                 this.groundOverlays.push(roadOverlay.image)
