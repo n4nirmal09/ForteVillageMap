@@ -58,3 +58,21 @@
   .btn-outline-dark {
     @include button-outline-variant(theme-color("dark"));
   }
+
+  .btn-primary {
+    @include button-variant(theme-color("primary"), theme-color("primary"));
+  }
+
+  .btn-secondary {
+    @include button-variant(theme-color("secondary"), theme-color("secondary"));
+  }
+
+  .btn-fab {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+  }

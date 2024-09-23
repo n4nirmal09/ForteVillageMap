@@ -6,13 +6,16 @@
 // Vendors
 @import './vendors/bootstrap/bootstrap';
 
-@import './layout',
-'./icons',
-'./buttons', 
-'./dropdowns', 
-'./animations',
-'./banners',
-'./forms',
-'./map',
-'./utilities';
+#{$namespace} {
+    @import './layout',
+    './icons',
+    './buttons', 
+    './dropdowns', 
+    './animations',
+    './banners',
+    './forms',
+    './map',
+    './utilities';
+}
+
 

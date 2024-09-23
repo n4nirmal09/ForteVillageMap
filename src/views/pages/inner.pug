@@ -1,0 +1,84 @@
+extends ../layouts/master.pug
+include ../mixins/form-outline.pug
+
+
+block content
+  div.container.px-0
+    section.main-map
+      .main-filter-list.main-map__action-area
+        .main-filter-list__item 
+          #forte-map-legends  
+
+      .aspect-ratio--monitor-fill.main-map__map-canvas
+        .aspect-ratio__inner-content 
+          div.forte-map-view.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/markers.json", 
+
+          data-locale={"Go to": "vai al sito", "Close" : "vicino", "Search": "Search", "Navigation": "Navigation", "No origin selected": "Please click on the marker to select origin"},
+
+          data-append-legends-to="#forte-map-legends"
+          data-navigation="true",
+          data-roads = "./js/data/roads.json",
+          data-options={
+            "disableAllMarkersOnNavigationSelect": false
+          }
+        )
+
+
+
+
+block scripts 
+  script. 
+    window.moduleChunks = {"utilities": ['maps']};
+
+    const overlayOptions = [
+      {
+        "coordinates": {
+          "S": 38.92836424033743,
+          "W": 8.91,
+          "N": 38.94287213966831,
+          "E": 8.945
+        },
+        "zoomLevel": 16,
+        "overlay": "https://www.fortevillageresort.com/wp-content/themes/fvr/mapforte2/images/map_zlvl_17.jpg"
+      },
+      {
+        "coordinates": {
+          "S": 38.92836424033743,
+          "W": 8.924896661581204,
+          "N": 38.94287213966831,
+          "E": 8.93744037274072
+        },
+        "zoomLevel": 18,
+        "overlay": "https://www.fortevillageresort.com/wp-content/themes/fvr/mapforte2/images/map_zlvl_18.webp"
+      }
+    ];
+
+    const mapOptions = {
+      "zoom": 17,
+      "center": {
+        "lat": 38.93240924257542,
+        "lng": 8.931271334750678
+      },
+      "minZoom": 16,
+      "maxZoom": 20,
+      "navigationModeZoom": 18,
+      "restriction": {
+        "latLngBounds": {
+          "north": 38.94287213966831,
+          "south": 38.92836424033743,
+          "east": 8.945,
+          "west": 8.91
+        },
+        "strictBounds": false
+      },
+      "disableDefaultUI": true,
+      "zoomControl": true
+    }
+
+    window.addEventListener('load', () => {
+      const fmapsEle = document.querySelector('.forte-map-view');
+      const forteMap = new MapController.ForteVillageMap(fmapsEle, {
+        mapOptions
+      }, overlayOptions);
+    })
+

@@ -1,7 +1,7 @@
 export default ({locale={}, mainClass='modal'}) => {
     return `<div class="${mainClass}">
                 <div class="${mainClass}__header">
-                    <h4 class="${mainClass}__header-title"></h4>
+                    <h3 class="${mainClass}__header-title"></h3>
                     <span class="${mainClass}__header-close btn btn-outline-gray-light" >
                         ${locale["Close"] || 'Close'} 
                     </span>

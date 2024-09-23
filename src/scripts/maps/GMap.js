@@ -67,11 +67,12 @@ export default class GMap {
         this.MapLoader = new GoogleMap.Loader({
             apiKey: GOOGLE_API_KEY,
             version: "weekly",
+            libraries: ['places', 'marker'],
             ...this.googleMapLoaderOptions
         })
 
         const promise = await new Promise((res, rej) => {
-            this.MapLoader.load().then(() => {
+            this.MapLoader.importLibrary('maps').then(() => {
                 res(google)
             }).catch((err) => {
                 rej(err)
@@ -130,7 +131,9 @@ export default class GMap {
 
 
         const marker = new google.maps.Marker({
+            map: this.Map,
             position: new google.maps.LatLng(lat, long),
+            title: label,
             label: label,
             icon: icon,
             details: {
@@ -144,6 +147,7 @@ export default class GMap {
         return marker
 
     }
+    
 
     removeAllMarkers() {
         this.selectedMarker = null

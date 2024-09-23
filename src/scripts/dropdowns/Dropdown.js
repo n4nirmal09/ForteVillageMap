@@ -100,18 +100,22 @@ export const Dropdown = (() => {
 
         // Callbacks
         openPanel() {
-            this.show = true
-            gsap.set(this.menu, {clearProps: "all"})
-            this._createDropdown()
-            this.panelAnimation()
-            this.container.dispatchEvent(this.events['panelUpdated'])
+            this.show = true;
+            gsap.set(this.menu, {clearProps: "all"});
+            this._createDropdown();
+            this.panelAnimation();
+            this.container.dispatchEvent(this.events['panelUpdated']);
+            this.container.classList.add('panel-active');
+            this.menu.classList.add('open-menu');
         }
 
         closePanel() {
-            this.show = false
-            this.panelAnimation()
+            this.show = false;
+            this.panelAnimation();
             this.trigger.blur();
-            this.container.dispatchEvent(this.events['panelUpdated'])
+            this.container.dispatchEvent(this.events['panelUpdated']);
+            this.container.classList.remove('panel-active');
+            this.menu.classList.remove('open-menu');
         }
 
         // Animations

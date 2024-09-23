@@ -12,6 +12,13 @@
     height: 100%;
     z-index: 1;
   }
+
+  &--monitor-fill {
+    &::before{
+      content: '';
+      padding-top: max(300px, var(--viewport-height, 100vh));
+    }
+  }
 }
 
 @each $suffix,
@@ -127,4 +134,14 @@ $breakpoint in $grid-breakpoints {
 
 .elevated-5-top-side {
   box-shadow: 0 -2px 5px -5px rgba(55, 56, 60, 0.5);
+}
+
+.px-0 {
+  padding-left: 0!important;
+  padding-right: 0!important;
+}
+
+.py-0 {
+  padding-top: 0!important;
+  padding-bottom: 0!important;
 }

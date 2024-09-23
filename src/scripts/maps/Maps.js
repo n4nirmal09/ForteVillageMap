@@ -8,9 +8,16 @@ import modalTpl from "./templates/map-modal.template"
 import { utilities } from "@/scripts/common/utilities"
 import { SelectDropdown } from "@/scripts/material-forms/Select"
 
+function capitalizeFirstLetter(string) {
+    if (typeof string !== 'string') {
+      return '';
+    }
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export const MapController = (() => {
     class ForteVillageMap {
-        constructor(container, options) {
+        constructor(container, options, groundOverlays = []) {
             this.container = container
             this.mapCanvas = null
             this.spotDetailsModal = null
@@ -60,15 +67,23 @@ export const MapController = (() => {
                 classPrepend: 'interactive-map',
                 markersFilterElement: document.querySelector(this.container.dataset.filterLink),
                 appendLegendsTo: this.container.dataset.appendLegendsTo ? document.querySelector(this.container.dataset.appendLegendsTo) : null,
-                appendNavigationTo: this.container.dataset.appendNavigationTo ? document.querySelector(this.container.dataset.appendNavigationTo) : null,
+                navigation: this.container.dataset.navigation === "true" ? true : false,
                 editorMode: false
             }, {
                 ...options,
                 ...(this.container.dataset.options ? JSON.parse(this.container.dataset.options) : {})
             })
 
-            this.groundOverlays = this.container.dataset.groundOverlays ? JSON.parse(this.container.dataset.groundOverlays) : []
+            this.groundOverlays = [
+                ...groundOverlays,
+                ...(this.container.dataset.groundOverlays ? JSON.parse(this.container.dataset.groundOverlays) : [])
+            ]
+
             this.navigationPanel = null
+            this.navigationPanelModel = null
+            this.navigationPanelModelActive = false
+            this.navigationPanelModelCloseBtn = null
+            this.navigationOpenBtn = null
 
             this._init()
         }
@@ -80,19 +95,21 @@ export const MapController = (() => {
         // Setup 
         async mapSetup() {
             this.mapLoading = true;
+            this.calcViewportHeight();
             this.createHTML();
             this.updateHTML();
-            this.updateFilterOptions()
-            const styles = await this.fetchGMapStyles()
-            await this.fetchMarkers()
-            if(this.roadsURL) await this.fetchRoads()
+            this.updateFilterOptions();
+            const styles = await this.fetchGMapStyles();
+            await this.fetchMarkers();
+            if(this.roadsURL) await this.fetchRoads();
            
-            this.options.mapOptions.styles = styles
-            this.initGoogleMap()
-            const images = await this.loadOverlayImages()
+            this.options.mapOptions.styles = styles;
+            this.initGoogleMap();
+            const images = await this.loadOverlayImages();
             this.mapLoading = false;
             this.updateHTML();
-            this._addEventListeners()
+            this._addEventListeners();
+            
         }
 
 
@@ -100,6 +117,8 @@ export const MapController = (() => {
         createHTML() {
             this.createMapCanvas()
             this.createSpotDetailsModal()
+            if(this.options.navigation)
+                this.createNavigationModel()
         }
 
         createMapCanvas() {
@@ -193,7 +212,7 @@ export const MapController = (() => {
         }
 
         createLegends(legends) {
-
+            
             if (!this.options.appendLegendsTo) return
             
             let categories = []
@@ -206,19 +225,23 @@ export const MapController = (() => {
                     })
                 }
             })
+
             
             
             
-            const dropdownListItems = this.options.appendLegendsTo.querySelectorAll('.legends-list__item-col:not(.legends-list__item-col--category)')
+            
+            const dropdownListItems = this.options.appendLegendsTo.querySelectorAll('.legends-list__item-col:not(.legends-list__item-col--category):not(.legends-list__item-col--search):not(.legends-list__item-col--nav-btn)')
             dropdownListItems.forEach((item) => {
+                console.log(item)
                 const sd = item.querySelector('[data-drop-down-select]')
-                sd.getSelectDropDown().destroy()
+                if(sd) sd.getSelectDropDown().destroy()
                 item.remove()
             })
             const dropdownListItemCategory = this.options.appendLegendsTo.querySelector('.legends-list__item-col--category')
             if(!dropdownListItemCategory) {
                 this.options.appendLegendsTo.innerHTML = ``
             }
+            
             
             const legendList = !dropdownListItemCategory ? document.createElement('ul') : this.options.appendLegendsTo.querySelector('.legends-list')
             if(!dropdownListItemCategory) legendList.classList.add('legends-list')
@@ -227,10 +250,12 @@ export const MapController = (() => {
                 const categoryFilterColumn = document.createElement('li')
                 categoryFilterColumn.classList.add('legends-list__item', 'legends-list__item-col', 'legends-list__item-col--category')
                 categoryFilterColumn.innerHTML = `<span class="legends-list__category-name">${this.locale['Category'] || 'Category'}</span>`
-                const categoryFilterDropdown = this.createDropdowns([{name: this.locale['All'] || 'All', value:"all", checked: true}, ...categories], {placeholder: this.locale['Search'] || 'Search',
+                const categoryFilterDropdown = this.createDropdowns([{name: this.locale['All'] || 'All', value:"all", checked: true}, ...categories], {placeholder: this.locale['Category'] || 'Category',
                     selectSwitches: true, 
                     legendFilter: true,
-                    inputModifiers: 'map-filter__input'
+                    inputModifiers: 'map-filter__input',
+                    containerModifiers: 'form-outline--rounded form-outline--icon-right',
+                    readOnly: true
                 })
                 categoryFilterColumn.appendChild(categoryFilterDropdown)
                 legendList.appendChild(categoryFilterColumn)
@@ -240,37 +265,91 @@ export const MapController = (() => {
                     input.addEventListener('change', (e) => this.onFilterChange(e))
                 })
             }
+
+            
             
 
-            categories.forEach((category) => {
-                const categoryColumn = document.createElement('li')
-                categoryColumn.classList.add('legends-list__item', 'legends-list__item-col')
-                categoryColumn.innerHTML = `<span class="legends-list__category-name">${category.name || category.value}</span>`
+            // categories.forEach((category) => {
+            //     const categoryColumn = document.createElement('li')
+            //     categoryColumn.classList.add('legends-list__item', 'legends-list__item-col')
+            //     categoryColumn.innerHTML = `<span class="legends-list__category-name">${category.name || category.value}</span>`
 
-                const categoryDropDown = this.createDropdowns(legends.filter((legend) => legend.type === category.value), {placeholder: this.locale['Search'] || 'Search', 
-                    selectSwitches: true, 
-                    inputModifiers: 'legends-list__filter-input'
+            //     const categoryDropDown = this.createDropdowns(legends.filter((legend) => legend.type === category.value), {placeholder: category.name ?  capitalizeFirstLetter(category.name) : null || this.locale['Search'] || 'Search', 
+            //         selectSwitches: false, 
+            //         inputModifiers: 'legends-list__filter-input'
+            //     })
+                
+            //     categoryColumn.appendChild(categoryDropDown)
+            //     legendList.appendChild(categoryColumn)
+            //     categoryColumn.addEventListener("selected", (e) => {
+            //         if(e.detail.getSelectedValue()) {
+            //             categoryColumn.classList.add("active");
+            //             return
+            //         }
+
+            //         categoryColumn.classList.remove("active");
+                    
+            //     })
+            // })
+
+            
+            const searchListItem = this.options.appendLegendsTo.querySelector('.legends-list__item-col--search')
+            if(!searchListItem) {
+                const searchColumn = document.createElement('li')
+                searchColumn.classList.add('legends-list__item', 'legends-list__item-col', 'legends-list__item-col--search')
+                searchColumn.innerHTML = `<span class="legends-list__category-name">${this.locale['Search'] || 'Search'}</span>`
+    
+                const searchDropdown = this.createDropdowns(legends, {
+                    placeholder: this.locale['Search'] || 'Search', 
+                    selectSwitches: false, 
+                    inputModifiers: 'legends-list__filter-input',
+                    containerModifiers: 'form-outline--rounded form-outline--icon-right'
                 })
                 
-                categoryColumn.appendChild(categoryDropDown)
-                legendList.appendChild(categoryColumn)
-            })
+                searchColumn.appendChild(searchDropdown)
+                legendList.appendChild(searchColumn)
+                searchColumn.addEventListener("selected", (e) => {
+                    if(e.detail.getSelectedValue()) {
+                        searchColumn.classList.add("active");
+                        return
+                    }
+    
+                    searchColumn.classList.remove("active");
+                    
+                })
+            }
+           
+            
+            const navigationToggleBtn = this.options.appendLegendsTo.querySelector('.legends-list__item-col--nav-btn')
+            if(!navigationToggleBtn) {
+                const  navigationTogglerBtnColumn =  document.createElement('li')
+                navigationTogglerBtnColumn.classList.add('legends-list__item', 'legends-list__item-col', 'legends-list__item-col--nav-btn')
+                navigationTogglerBtnColumn.innerHTML = `<span class="btn btn-fab btn-secondary"><i class="material-icons">route</i></span>`
+                legendList.appendChild(navigationTogglerBtnColumn)
+
+                this.navigationOpenBtn = navigationTogglerBtnColumn.querySelector('.btn');
+                this.navigationOpenBtn?.addEventListener("click", () => !this.navigationPanelModelActive && this.showNavigationModel(true))
+            }
+            
 
 
             this.options.appendLegendsTo.appendChild(legendList)
 
         }
 
-        createDropdowns(dropdownItems, { placeholder, selectSwitches, legendFilter, inputModifiers }) {
+        createDropdowns(dropdownItems, { placeholder, selectSwitches, legendFilter, inputModifiers, containerModifiers = 'form-outline--icon-right', icon= 'expand_more', readOnly = false }) {
             const categoryDropDown = document.createElement('div')
-            categoryDropDown.classList.add('form-outline', 'form-outline--text-line', 'form-outline--icon-right')
+            categoryDropDown.classList.add('form-outline')
+            categoryDropDown.classList.add(...containerModifiers.trim().split(/\s+/)) 
 
             categoryDropDown.dataset.dropDownSelect = true
             if(selectSwitches) categoryDropDown.dataset.dropdownSelectSwitches = true
-            categoryDropDown.innerHTML = `<input class="${inputModifiers} form-outline__input form-control form-select form-solo" value="" placeholder="${placeholder}" data-toggle="dropdown-toggle" autocomplete="off"><i class="material-icons">expand_more</i>`
-
+            categoryDropDown.innerHTML = `<input class="${inputModifiers} form-outline__input form-control form-select form-solo" value="" placeholder="${placeholder}" data-toggle="dropdown-toggle" ${readOnly ? 'readOnly="true"' : ''} autocomplete="off"><i class="material-icons">${icon}</i>`
+            const dropdown =  document.createElement('div');
+            dropdown.classList.add('dropdown-menu', 'dropdown-menu--select-options');
             const categoryList = document.createElement('ul')
-            categoryList.classList.add('legends-list', 'legends-list--inner', 'dropdown-menu', 'dropdown-menu--select-options')
+            categoryList.classList.add('dropdown-menu__inner', 'legends-list', 'legends-list--inner')
+            
             dropdownItems.forEach((item) => {
                 categoryList.appendChild(this.createDropdownItem({
                     ...item
@@ -279,7 +358,9 @@ export const MapController = (() => {
                 }, legendFilter))
             })
 
-            categoryDropDown.appendChild(categoryList)
+            dropdown.appendChild(categoryList)
+
+            categoryDropDown.appendChild(dropdown)
             new SelectDropdown(categoryDropDown)
             return categoryDropDown
         }
@@ -306,24 +387,49 @@ export const MapController = (() => {
 
         // Navigation
         clearNavigation() {
-            const navigationContainer = this.options.appendNavigationTo
-            const selectDropdowns = navigationContainer.querySelectorAll('[data-drop-down-select]')
+            const navigationPanelModelBody = this.navigationPanelModel.querySelector(`.${this.options.classPrepend}-modal__body`)
+            const selectDropdowns = navigationPanelModelBody.querySelectorAll('[data-drop-down-select]')
             selectDropdowns.forEach((sd) => {
                 sd.getSelectDropDown().destroy()
             })
-            navigationContainer.innerHTML = ``
+            navigationPanelModelBody.innerHTML = ``
             this.navigationPanel = null
         }
+
+        createNavigationModel() {
+            this.navigationPanelModel = utilities.createNodeParsing(modalTpl({
+                mainClass: `${this.options.classPrepend}-modal`,
+                locale: this.locale
+            }))
+
+            this.navigationPanelModelCloseBtn = this.navigationPanelModel.querySelector(`.${this.options.classPrepend}-modal__header-close`)
+
+            this.navigationPanelModel.querySelector(`.${this.options.classPrepend}-modal__link `)?.remove()
+        }
+
         createNavigation() {
-            if (!this.options.appendNavigationTo) return
+            if (!this.options.navigation) return
             
             this.clearNavigation()
-            const navigationContainer = this.options.appendNavigationTo
             this.navigationPanel = document.createElement('div')
             this.navigationPanel.classList.add('map-navigation-panel')
             this.navigationPanel.appendChild(this.createNavigationUI())
             
-            navigationContainer.appendChild(this.navigationPanel)
+            //navigationContainer.appendChild(this.navigationPanel)
+
+            
+
+            
+            const navigationPanelModelBody = this.navigationPanelModel.querySelector(`.${this.options.classPrepend}-modal__body`)
+            const navigationPanelModelTitle = this.navigationPanelModel.querySelector(`.${this.options.classPrepend}-modal__header-title`)
+            navigationPanelModelTitle.innerHTML = `${this.locale["Navigation"] || ''}`
+            navigationPanelModelBody.innerHTML = ``
+            navigationPanelModelBody.appendChild(this.navigationPanel)
+            
+            
+
+            this.container.appendChild(this.navigationPanelModel)
+            
             this.updateNavigation()
 
         }
@@ -331,19 +437,19 @@ export const MapController = (() => {
         createNavigationUI() {
             const navigationDiv = document.createElement('div')
             navigationDiv.classList.add('map-navigation-panel__row')
-            navigationDiv.innerHTML = `<span class="map-navigation-panel__col map-navigation-panel__col--title">${this.locale["Navigation"] || ''}</span>`
+            // navigationDiv.innerHTML = `<span class="map-navigation-panel__col map-navigation-panel__col--title">${this.locale["Navigation"] || ''}</span>`
             if(!this.activeSpot) {
                 const originCol = document.createElement('div')
-                originCol.innerHTML = `<span>${this.locale["Origin"] || 'Origin'}</span>`
+                originCol.innerHTML = `<h4 class="map-navigation-panel__label">${this.locale["Origin"] || 'Origin'}</h4>`
                 originCol.classList.add('map-navigation-panel__col')
-                const originField = this.createTextField({name: `${this.locale["No origin selected"] || 'No origin selected'}`}, { readOnly: true })
+                const originField = this.createTextField({name: `${this.locale["No origin selected"] || 'Please click on the marker to select origin'}`}, { readOnly: true, containerModifiers: 'form-outline--rounded  form-outline--icon-right form-outline--icon-right-offseted', icon : 'trip_origin'  })
                 originField.classList.add('main-navigation__origin-field')
                 originCol.appendChild(originField)
 
                 const destinationCol = document.createElement('div')
-                destinationCol.innerHTML = `<span>${this.locale["Destination"] || 'Destination'}</span>`
+                destinationCol.innerHTML = `<h4 class="map-navigation-panel__label">${this.locale["Destination"] || 'Destination'}</h4>`
                 destinationCol.classList.add('map-navigation-panel__col')
-                const destinationField = this.createTextField({name: "..."}, { readOnly: true })
+                const destinationField = this.createTextField({name: "..."}, { readOnly: true, containerModifiers: 'form-outline--rounded form-outline--icon-right form-outline--icon-right-offseted', icon : 'location_on' })
                 destinationField.classList.add('main-navigation__destination-field')
                 destinationCol.appendChild(destinationField)
 
@@ -353,17 +459,17 @@ export const MapController = (() => {
             }
             
             const originCol = document.createElement('div')
-            originCol.innerHTML = `<span>${this.locale["Origin"] || 'Origin'}</span>`
+            originCol.innerHTML = `<h4 class="map-navigation-panel__label">${this.locale["Origin"] || 'Origin'}</h4>`
             originCol.classList.add('map-navigation-panel__col')
             const destinationCol = document.createElement('div')
-            destinationCol.innerHTML = `<span>${this.locale["Destination"] || 'Destination'}</span>`
+            destinationCol.innerHTML = `<h4 class="map-navigation-panel__label">${this.locale["Destination"] || 'Destination'}</h4>`
             destinationCol.classList.add('map-navigation-panel__col')
             const actionCol = document.createElement('div')
             actionCol.classList.add('map-navigation-panel__col', 'map-navigation-panel__col--action')
-            const clearCol = document.createElement('div')
-            clearCol.classList.add('map-navigation-panel__col', 'map-navigation-panel__col--action')
+            // const clearCol = document.createElement('div')
+            // clearCol.classList.add('map-navigation-panel__col', 'map-navigation-panel__col--action')
 
-            const originField = this.createTextField(this.activeSpot, { readOnly: true })
+            const originField = this.createTextField(this.activeSpot, { readOnly: true, containerModifiers: 'form-outline--rounded form-outline--icon-right form-outline--icon-right-offseted',  icon : 'trip_origin' })
             originField.classList.add('main-navigation__origin-field')
             originCol.appendChild(originField)
             navigationDiv.appendChild(originCol)
@@ -374,25 +480,25 @@ export const MapController = (() => {
                     value: value || name
                 }
             })
-            const destinationField = this.createDropdowns(markers, {placeholder: this.locale['Search'] || 'Search'})
+            const destinationField = this.createDropdowns(markers, {placeholder: this.locale['Search'] || 'Search', containerModifiers: 'form-outline--rounded  form-outline--icon-right form-outline--icon-right-offseted', icon : 'location_on'})
             destinationField.classList.add('main-navigation__destination-field')
             destinationCol.appendChild(destinationField)
             navigationDiv.appendChild(destinationCol)
 
             const navigateBtn = document.createElement('span')
-            navigateBtn.classList.add('btn', 'btn-outline-dark', 'btn--navigate')
+            navigateBtn.classList.add('btn', 'btn-secondary', 'btn--navigate')
             navigateBtn.innerHTML = `${this.locale["Navigate"] || 'Navigate'}`
             actionCol.appendChild(navigateBtn)
-            navigationDiv.appendChild(actionCol)
+            //navigationDiv.appendChild(actionCol)
             navigateBtn.addEventListener("click", () => this.onNavigationClick())
 
 
             const clearBtn = document.createElement('span')
             clearBtn.classList.add('btn', 'btn-outline-dark', 'd-none', 'btn--clear')
             clearBtn.innerHTML = `${this.locale["Clear"] || 'Clear'}`
-            clearCol.appendChild(clearBtn)
-            navigationDiv.appendChild(clearCol)
-            clearCol.addEventListener("click", () => this.onNavigationClear())
+            actionCol.appendChild(clearBtn)
+            navigationDiv.appendChild(actionCol)
+            clearBtn.addEventListener("click", () => this.onNavigationClear())
             destinationField.addEventListener("selected", (e) => this.updateNavigation())
             
             
@@ -422,12 +528,14 @@ export const MapController = (() => {
         }
 
         onNavigationClick() {
+            console.log(this.roads)
             const origin = this.navigationPanel.querySelector('.main-navigation__origin-field input')
             const destination = this.navigationPanel.querySelector('.main-navigation__destination-field')
             
             const roadOverlay = this.roads.find((road) => road.origin === origin.value && road.destination === destination.getValue().value)
             if(roadOverlay) {
                 this.showModal(false)
+                this.showNavigationModel(false)
                 this.Map.getMap().setZoom(this.options.mapOptions.navigationModeZoom || this.options.mapOptions.zoom)
                 this.roadNavigationMode = true
                 this.removeAllRoadOverlays()
@@ -435,6 +543,8 @@ export const MapController = (() => {
                 if(this.options.disableAllMarkersOnNavigationSelect) this.unCheckAllFilters()
                 this.updateGroundOverlay()
                 this.updateNavigation()
+            } else {
+                alert(this.locale["No roads"] || 'No roads available')
             }
             
         }
@@ -450,41 +560,105 @@ export const MapController = (() => {
             if(this.options.disableAllMarkersOnNavigationSelect) this.unCheckAllFilters('all')
         }
 
-        createTextField(spot, options) {
+        createTextField(spot, {icon="expand_more", ...options}) {
             
             const formOutline = document.createElement('div')
-            formOutline.classList.add('form-outline', 'form-outline--text-line', 'form-outline--icon-right')
-            formOutline.innerHTML = `<input class="form-outline__input form-control form-solo" ${options.readOnly ? ' readOnly="true" ' : ''} value="${spot.name}" placeholder="Origin" autocomplete="off">`
+            formOutline.classList.add('form-outline')
+            options.containerModifiers && formOutline.classList.add(...options.containerModifiers.trim().split(/\s+/))
+            formOutline.innerHTML = `<input class="form-outline__input form-control form-solo" ${options.readOnly ? ' readOnly="true" ' : ''} value="${spot.name}" placeholder="Origin" autocomplete="off"><i class="material-icons">${icon}</i>`
             return formOutline
         }
 
         // Update filter options
-        updateFilterOptions() {
-            const filterElement = this.options.markersFilterElement || this.options.appendLegendsTo?.querySelector('.legends-list__item-col--category') || null
+        updateFilterOptions(e) {
+            const filterElement = this.options.markersFilterElement || this.options.appendLegendsTo?.querySelector('.legends-list__item-col--category') || null;
+            
             if (!filterElement) {
                 this.markersFilter = ['all']
+                
                 return
             }
-            const inputs = filterElement?.querySelectorAll('.map-filter__item-input')
-            const checkedValues = []
+            
+            const inputs = Array.from(filterElement?.querySelectorAll('.map-filter__item-input'));
+            const checkedValues = [];
+            // Handle event logic for "all" and other filters
+            if (e && e.target.value) {
+                if (e.target.checked && e.target.value === "all") {
+                    inputs.forEach((input) =>  {
+                        if (input.checked && input.value !== "all") input.checked = false;
+                    });
+                } else {
+                    inputs.find((input) => input.value === 'all').checked = false;
+                }
+            }
+            
             inputs.forEach((input) => {
                 if (input.checked) checkedValues.push(input.value)
             })
-            this.markersFilter = checkedValues
+            this.markersFilter = checkedValues;
 
             const markersFilterInput = filterElement?.querySelector('.map-filter__input')
-            if (checkedValues.findIndex((val) => val === 'all') !== -1) {
+           
+            if (checkedValues.length === 0 || checkedValues.findIndex((val) => val === 'all') !== -1) {
                 markersFilterInput.value = ''
+                filterElement.classList.remove('active');
                 return
             }
+
+            filterElement.classList.add('active');
             if (markersFilterInput) markersFilterInput.value = checkedValues.filter((val) => val !== 'all').join(', ')
         }
+
+        // updateFilterOptions() {
+        //     const filterElement = this.options.markersFilterElement || this.options.appendLegendsTo?.querySelector('.legends-list__item-col--category') || null;
+        //     if (!filterElement) {
+        //         this.markersFilter = ['all'];
+        //         return;
+        //     }
+        //     const inputs = filterElement.querySelectorAll('.map-filter__item-input');
+        //     let checkedValues = [];
+        //     inputs.forEach((input) => {
+        //         if (input.checked) checkedValues.push(input.value);
+        //     });
+        
+        //     // If "all" is checked, uncheck all other filters
+        //     if (checkedValues.includes('all')) {
+        //         inputs.forEach((input) => {
+        //             if (input.value !== 'all') input.checked = false;
+        //         });
+        //         this.markersFilter = ['all'];
+        //     } else {
+        //         // If any other filter is checked, uncheck "all"
+        //         const allInput = filterElement.querySelector('.map-filter__item-input[value="all"]');
+        //         if (allInput.checked) {
+        //             allInput.checked = false;
+        //         }
+        //         this.markersFilter = checkedValues;
+        //     }
+        
+        //     const markersFilterInput = filterElement.querySelector('.map-filter__input');
+        //     if (this.markersFilter.length === 0 || this.markersFilter.includes('all')) {
+        //         markersFilterInput.value = '';
+        //         filterElement.classList.remove('active');
+        //     } else {
+        //         filterElement.classList.add('active');
+        //         if (markersFilterInput) markersFilterInput.value = this.markersFilter.join(', ');
+        //     }
+        // }
+        
+        
 
         // Modal detail functions
         showModal(show) {
             this.spotsDetailModalActive = show
             this.spotsDetailModalActive ? this.spotDetailsModal.classList.add(`${this.options.classPrepend}-modal--show`) :
                 this.spotDetailsModal.classList.remove(`${this.options.classPrepend}-modal--show`)
+        }
+
+        showNavigationModel(show) {
+            this.navigationPanelModelActive = show
+            this.navigationPanelModelActive ? this.navigationPanelModel.classList.add(`${this.options.classPrepend}-modal--show`) :
+            this.navigationPanelModel.classList.remove(`${this.options.classPrepend}-modal--show`)
         }
 
         updateModal() {
@@ -631,14 +805,21 @@ export const MapController = (() => {
         }
 
         onFilterChange(e) {
-            this.updateFilterOptions()
+            this.updateFilterOptions(e)
             this.updateMarkers()
+        }
+
+        calcViewportHeight() {
+            const viewportHeight = window.innerHeight;
+            document.documentElement.style.setProperty('--viewport-height', `${viewportHeight}px`);
         }
 
         // Resize Func
         _responsiveFunc() {
             return utilities.debounce(() => {
                 // Resize funcs here
+                this.calcViewportHeight()
+
             }, 250)
         }
 
@@ -646,6 +827,10 @@ export const MapController = (() => {
         _addEventListeners() {
             this.container.addEventListener("markerClick", (e) => this.onMarkerClick(e))
             this.spotDetailClose.addEventListener("click", () => this.spotsDetailModalActive && this.showModal(false))
+
+            
+            this.navigationPanelModelCloseBtn?.addEventListener("click", () => this.navigationPanelModelActive && this.showNavigationModel(false))
+
             this.container.addEventListener("mapZoomed", (e) => this.onMapZoom(e))
 
             const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input') || []
@@ -654,6 +839,7 @@ export const MapController = (() => {
             })
 
             window.addEventListener('resize', this._responsiveFunc())
+            
         }
     }
     return {

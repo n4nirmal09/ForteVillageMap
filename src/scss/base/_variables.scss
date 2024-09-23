@@ -1,5 +1,6 @@
 $image-path: '../assets/images';
 $font-path : '../assets/fonts';
+$namespace: '#fortevillage-map-body';
 
 // Grid columns
 //
@@ -25,13 +26,15 @@ $screen-xs   : 541px;
 $screen-sm   : 576px;
 $screen-md   : 992px;
 $screen-lg   : 1025px;
-$screen-xl   : 1280px;
+$screen-xl   : 1480px;
+$screen-xxl   : 1930px;
 
 $grid-breakpoints: (xs: 0,
         sm: $screen-sm,
         md: $screen-md,
         lg: $screen-lg,
         xl: $screen-xl,
+        xxl: $screen-xxl
         //hd: $screen-hd
 );
 
@@ -39,6 +42,7 @@ $container-max-widths: (sm: 100%,
         md: 720px,
         lg: 960px,
         xl: (1142px + $grid-gutter-width-container-larger),
+        xxl: (1440px + $grid-gutter-width-container-larger),
 );
 
 $container-sm-max-width               : 1040px;
@@ -76,7 +80,7 @@ $grays: map-merge(("100": $gray-100,
                 "800": $gray-800,
                 "900": $gray-900), $grays);
 
-$blue             : #00b4f3;
+$blue             : #1a73e8;
 $blue-dark        : #051A26;
 $blue-darker      : #091F2C;
 $blue-lighter     : #e9eef9;
@@ -116,7 +120,7 @@ $colors: map-merge(("blue": $blue,
                 "gray-darker": $gray-900), $colors);
 
 $primary        : $green-dark;
-$secondary      : $orange;
+$secondary      : $blue;
 $tertiary       : $pink;
 $accent         : $biege;
 $success        : $green !default;
@@ -413,7 +417,7 @@ $aspectRatios: map-merge(("4x3": aspect-ratio(4, 3),
                 "5x3": aspect-ratio(5, 3),
                 "2x3": aspect-ratio(2, 3),
                 "3x2": aspect-ratio(3, 2),
-                "16x9": aspect-ratio(16, 9)
+                "16x9": aspect-ratio(16, 9),
         ), $aspectRatios
 );
 

@@ -2,7 +2,7 @@ export const SiteSetup = (function (window) {
     /* Main css Chunks */
     function _loadSiteCss() {
         return Promise.all([
-            import(/* webpackChunkName: "main" */'@/scss/main.scss'),
+            import(/* webpackChunkName: "fortemap" */'@/scss/main.scss'),
         ])
     }
 

@@ -2,113 +2,59 @@ extends ./layouts/master.pug
 include ./mixins/form-outline.pug
 block header 
   header Header
+
 block content
   div.container
-    .main-filter-list 
-      //- .main-filter-list__item
-      //-     div.d-flex
-      //-       span.flex-1 Category  
-      //-     #forte-map-filter.form-outline(class="form-outline--text-line form-outline--icon-right", data-dropdown-select=true, data-dropdown-select-switches="true")
-      //-       input.map-filter__input.form-outline__input.form-control(value= '', class='form-select form-solo',  placeholder = 'Search', data-toggle='dropdown-toggle',  autocomplete="off")
-      //-       i.material-icons expand_more
-      //-       .dropdown-menu.dropdown-menu--select-options(aria-labelledby='select-dropdown')
-      //-         each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Restuarants", "value": "restaurants-bars"}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}, {"name": "Resort", "value": "resort"}]
-      //-           .dropdown-item(data-selected=false, data-value=i.value data-label=i.name)
-      //-             input.map-filter__item-input(type="checkbox" name="map-filter", value=i.value, checked = i.selected) 
-      //-             label.map-filter__item-label !{i.name}
+    section.main-map
+      .main-filter-list.main-map__action-area
+        .main-filter-list__item 
+          #forte-map-legends  
 
-          //- div.d-flex(role='button' data-toggle='dropdown', aria-haspopup='true' aria-expanded='false')
-          //-   span.flex-1 Category dropdown 
-          //-   i.material-symbols-outlined.flex-auto expand_more
-          //- .dropdown-menu.dropdown-menu--fill
-          //-   .dropdown-menu__body
-          //-     each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}]
-          //-       .dropdown-item
-          //-         input.map-filter__item-input(type="checkbox" name="map-filter", value=i.value, checked = i.selected) 
-          //-         label.map-filter__item-label !{i.name}
-      //- .col 
-      //-   +form-outline({
-      //-     modifiers: 'form-outline--text-line form-outline--icon-right',
-      //-     inputModifiers: 'form-select form-solo',
-      //-     placeholder: 'Category',
-      //-     dropdownSelect: 'true',
-      //-     toggle: 'dropdown-toggle',
-      //-     icon: 'expand_more',
-      //-     appendTo: 'body',
-      //-     dropdownItems: [{
-      //-       value: 'select A',
-      //-       label: 'select A',
-      //-       selected: false
-      //-     },{
-      //-       value: 'select B',
-      //-       label: 'select B',
-      //-       selected: false
-      //-     },{
-      //-       value: 'option C', 
-      //-       label: 'option C',
-      //-       selected: false
-      //-     }]
-      //-   })
-      .main-filter-list__item 
-        #forte-map-legends  
-    //- .map-filter#forte-map-filter
-    //-   ul.map-filter__list.list-unstyled.list-row
-    //-     each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}]
-    //-       li.map-filter__item.list-col
-    //-         input.map-filter__item-input(type="checkbox" name="map-filter", value=i.value, checked = i.selected) 
-    //-         label.map-filter__item-label !{i.name}
-    //- .map-filter#forte-map-filter-radio
-    //-   ul.map-filter__list
-    //-     each i in [{"name": "All", "value": "all", "selected": true}, {"name": "Hotel", "value": "hotel"}, {"name": "Villa", "value": "villa"}]
-    //-       li.map-filter__item 
-    //-         input.map-filter__item-input(type="radio" name="map-filter", value=i.value, checked = i.selected) 
-    //-         label.map-filter__item-label !{i.name}
-
-    .aspect-ratio--16x9 
-      .aspect-ratio__inner-content 
-        div.forte-map.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/markers.json", 
-        data-ground-overlays=[
-        {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
-        "zoomLevel": 16,
-        "maxZoomLevel": 18,
-        "overlay": "images/MAPNEWNEWNEW.jpg"},
-        {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
-        "zoomLevel": 18,
-        "overlay": "images/Offset-2.png"
-        },
-        {"coordinates":{"S": 38.92836424033743, "W": 8.92, "N": 38.94287213966831, "E": 8.924896661531204}, 
-        "zoomLevel": 16,
-        "overlay": "images/Offset-2.png"
-        },
-      ], data-map-options={
-        zoom: 16, 
-        center: { lat:  38.93240924257542, lng: 8.931271334750678},
-        minZoom: 16,
-        maxZoom: 20,
-        navigationModeZoom: 18,
-        restriction: {
-          latLngBounds: {
-            north: 38.94287213966831,
-            south: 38.92836424033743,
-            east: 8.945,
-            west: 8.91,
-          },
-          strictBounds: false,                     
-        },
-        disableDefaultUI: true,
-        zoomControl: true
-      }, 
-      data-locale={"Go to": "vai al sito", "Close" : "vicino", "Search": "Search", "Navigation": "Navigation title", "No origin selected": "No origin selected"},
-      
-      data-append-legends-to="#forte-map-legends"
-      data-append-navigation-to="#map-navigation",
-      data-roads = "./js/data/roads.json",
-      data-options={
-        "disableAllMarkersOnNavigationSelect": false
-      }
-      )
-  .container 
-    div#map-navigation
+      .aspect-ratio--16x9.main-map__map-canvas
+        .aspect-ratio__inner-content 
+          div.forte-map.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/markers.json", 
+            data-ground-overlays=[
+            {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
+            "zoomLevel": 16,
+            "maxZoomLevel": 18,
+            "overlay": "images/MAPNEWNEWNEW.jpg"},
+            {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
+            "zoomLevel": 18,
+            "overlay": "images/Offset-2.png"
+            },
+            {"coordinates":{"S": 38.92836424033743, "W": 8.92, "N": 38.94287213966831, "E": 8.924896661531204}, 
+            "zoomLevel": 16,
+            "overlay": "images/Offset-2.png"
+            },
+          ], data-map-options={
+            zoom: 17, 
+            center: { lat:  38.93240924257542, lng: 8.931271334750678},
+            minZoom: 16,
+            maxZoom: 20,
+            navigationModeZoom: 18,
+            restriction: {
+              latLngBounds: {
+                north: 38.94287213966831,
+                south: 38.92836424033743,
+                east: 8.945,
+                west: 8.91,
+              },
+              strictBounds: false,                     
+            },
+            disableDefaultUI: true,
+            zoomControl: true
+          }, 
+          data-locale={"Go to": "vai al sito", "Close" : "vicino", "Search": "Search", "Navigation": "Navigation", "No origin selected": "Please click on the marker to select origin"},
+          
+          data-append-legends-to="#forte-map-legends"
+          data-navigation="true",
+          data-roads = "./js/data/roads.json",
+          data-options={
+            "disableAllMarkersOnNavigationSelect": false
+          }
+        )
+    .container 
+      div#map-navigation
   .container 
     .d-flex 
       .col-auto
@@ -167,15 +113,10 @@ block scripts
         zoomControl: true
       }
 
-      let groundOverlays = [
-        {"coordinates":{"S": 38.92836424033743, "W": 8.924896661531204, "N": 38.94287213966831, "E": 8.937440372730721}, 
-        "zoomLevel": 16,
-        "overlay": "./images/MAPNEWNEWNEW.jpg"},
-        {"coordinates":{"S": 38.92836424033743, "W": 8.92, "N": 38.94287213966831, "E": 8.924896661531204}, 
-        "zoomLevel": 16,
-        "overlay": "./images/Offset-2.png"
-        },
-      ]
+      let groundOverlays = [{"coordinates":{"S":38.92836424033743,"W":8.91,"N":38.94287213966831,"E":8.945},
+                                    "zoomLevel":16, "overlay":"images/map_zlvl_17.jpg"},
+                                    {"coordinates":{"S":38.92836424033743,"W":8.924896661581204,"N":38.94287213966831,"E":8.93744037274072},
+                                    "zoomLevel":18,"overlay":"images/map_zlvl_18.webp"}];
 
       updateInputAreas();
       
