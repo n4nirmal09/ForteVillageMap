@@ -302,6 +302,7 @@ export const MapController = (() => {
                 const searchDropdown = this.createDropdowns(legends, {
                     placeholder: this.locale['Search'] || 'Search', 
                     selectSwitches: false, 
+                    icon: 'search',
                     inputModifiers: 'legends-list__filter-input',
                     containerModifiers: 'form-outline--rounded form-outline--icon-right'
                 })
@@ -649,16 +650,23 @@ export const MapController = (() => {
         
 
         // Modal detail functions
+        modalContainerActive() {
+            this.spotsDetailModalActive || this.navigationPanelModelActive ? this.container.classList.add(`${this.options.classPrepend}--modal-open`) :
+            this.container.classList.remove(`${this.options.classPrepend}--modal-open`)
+        }
+
         showModal(show) {
             this.spotsDetailModalActive = show
             this.spotsDetailModalActive ? this.spotDetailsModal.classList.add(`${this.options.classPrepend}-modal--show`) :
                 this.spotDetailsModal.classList.remove(`${this.options.classPrepend}-modal--show`)
+            this.modalContainerActive()
         }
 
         showNavigationModel(show) {
             this.navigationPanelModelActive = show
             this.navigationPanelModelActive ? this.navigationPanelModel.classList.add(`${this.options.classPrepend}-modal--show`) :
             this.navigationPanelModel.classList.remove(`${this.options.classPrepend}-modal--show`)
+            this.modalContainerActive()
         }
 
         updateModal() {

@@ -118,12 +118,14 @@
 
     &--icon-right {
         position: relative;
+        
 
         >.form-outline__input {
             padding-right: 2.8rem;
         }
 
         >i {
+            pointer-events: none;
             position : absolute;
             right    : 1rem;
             top      : 50%;
@@ -142,12 +144,14 @@
 
     &--icon-left {
         position: relative;
+        
 
         >.form-outline__input {
             padding-left: 2.8rem;
         }
 
         >i {
+            pointer-events: none;
             position : absolute;
             left    : 1rem;
             top      : 50%;
