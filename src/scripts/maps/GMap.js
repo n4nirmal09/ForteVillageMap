@@ -59,8 +59,7 @@ export default class GMap {
         this.iconAnimateInterval = null
         this.iconAnimateTimeout = null
 
-        this.spotlightMarker = null
-        this.mainIconMarker = null
+        this.spotlightMarkers = []
         this.init()
     }
 
@@ -185,7 +184,6 @@ export default class GMap {
             if(this.infoPopup) marker.infoWindow?.close()
         })
         this.markers = []
-        this.clearIconAnimateUtils()
         this.clearActiveMarkers()
     }
 
@@ -260,24 +258,17 @@ export default class GMap {
 
     }
 
-    clearIconAnimateUtils() {
-        if(this.iconAnimateInterval) {
-            clearInterval(this.iconAnimateInterval)
-            this.iconAnimateInterval = null
-        }
-
-        if(this.iconAnimateTimeout) {
-            clearTimeout(this.iconAnimateTimeout)
-            this.iconAnimateTimeout = null
-        }
-    }
+    
 
     clearActiveMarkers() {
-        if (this.spotlightMarker) {
-            this.spotlightMarker.setMap(null);
-        }
-        if (this.mainIconMarker) {
-            this.mainIconMarker.setMap(null);
+        if (this.spotlightMarkers.length) {
+            this.spotlightMarkers.forEach(({slm, mim, iconAnimationInterval, iconAnimationTimeout}) => {
+                if (slm) slm.setMap(null);
+                if (mim) mim.setMap(null);
+                if (iconAnimationInterval) clearInterval(iconAnimationInterval);
+                if (iconAnimationTimeout) clearTimeout(iconAnimationTimeout);
+            });
+            this.spotlightMarkers = [];
         }
     }
 
@@ -289,8 +280,6 @@ export default class GMap {
             this.showInfoWindow(marker)
             return
         }
-
-        this.clearIconAnimateUtils()
 
 
         this.selectedMarker = marker
@@ -321,39 +310,45 @@ export default class GMap {
         
     }
 
-    createActiveMarkers(marker) {
-        this.spotlightMarker = new google.maps.Marker({
+    createActiveMarkers(markerId) {
+        
+        let marker = typeof markerId === 'number' ? this.markers[markerId].mainMarker : markerId
+
+        const existingMarker = this.spotlightMarkers.find((m) => m.mim === marker)
+        if (existingMarker) return
+
+        const spotLightMarker = new google.maps.Marker({
             position: marker.getPosition(),
             map: this.Map,
             icon: {
                 url: this.getRandomSpotlightIcon(),
-                scaledSize: new google.maps.Size(40, 50),  // Size of the spotlight icon
-                anchor: new google.maps.Point(20, 58),  // Adjust anchor point to position it correctly
+                scaledSize: new google.maps.Size(40, 50),  
+                anchor: new google.maps.Point(20, 58),  
             },
-            zIndex: 1,  // Ensure the spotlight stays behind the main icon
-        });
+            zIndex: 2, 
+        })
 
-        if(marker.details.icon) {
-            this.mainIconMarker = new google.maps.Marker({
-                position: marker.getPosition(),
-                map: this.Map,
-                icon: {
-                    url: marker.details.icon,  
-                    scaledSize: new google.maps.Size(24, 24),  
-                    anchor: new google.maps.Point(12, 50), 
-                },
-                zIndex: 2, 
-            });
+        const mainIconMarker = marker.details.icon ? new google.maps.Marker({
+            position: marker.getPosition(),
+            map: this.Map,
+            icon: {
+                url: marker.details.icon,
+                scaledSize: new google.maps.Size(24, 24),
+                anchor: new google.maps.Point(12, 50),
+            },
+            zIndex: 3,
+        }) : null;
+
+        const activeMarkerObj = {
+            slm: spotLightMarker,
+            mim: mainIconMarker,
+            iconAnimationInterval: null,
+            iconAnimationTimeout: null,
         }
-        
-
-        this.markerAnimationAndRemove(this.spotlightMarker)
-        if(this.mainIconMarker) this.markerAnimationAndRemove(this.mainIconMarker)
-        this.iconAnimateInterval = setInterval(() => {
-            this.markerAnimationAndRemove(this.spotlightMarker)
-            if(this.mainIconMarker) this.markerAnimationAndRemove(this.mainIconMarker)
-        }, 8000)
+        this.spotlightMarkers.push(activeMarkerObj);
     
+        
+        this.animateMarker(activeMarkerObj)
     }
 
     getRandomSpotlightIcon() {
@@ -362,15 +357,26 @@ export default class GMap {
         return `./images/spotlight-${randomColor}.png`
     }
 
-    markerAnimationAndRemove(marker) {
-        if(!marker) return
-        marker.setAnimation(google.maps.Animation.BOUNCE)
-        this.iconAnimateTimeout =  setTimeout(() => {
-            marker.setAnimation(null)
-            this.iconAnimateTimeout = null
+    animateMarker(markerObj) {
+        this.markerAnimationAndRemove(markerObj);
+    
+        markerObj.iconAnimationInterval = setInterval(() => {
+            this.markerAnimationAndRemove(markerObj)
+            
+        }, 8000)
+    }
+
+    markerAnimationAndRemove(markerObj) {
+        if(!markerObj) return
+        if(markerObj.slm) markerObj.slm.setAnimation(google.maps.Animation.BOUNCE)
+        if(markerObj.mim) markerObj.mim.setAnimation(google.maps.Animation.BOUNCE)
+        
+        markerObj.iconAnimateTimeout =  setTimeout(() => {
+            if(markerObj.slm) markerObj.slm.setAnimation(null)
+            if(markerObj.mim) markerObj.mim.setAnimation(null)
+            markerObj.iconAnimateTimeout = null
         }, 2800);
     } 
-
     
 
     markerClick(marker) {
@@ -403,7 +409,6 @@ export default class GMap {
     // Marker Utilities
     selectMarker(marker) {
         if(typeof marker === "number") {
-            console.log(marker)
             new google.maps.event.trigger(this.markers[marker].mainMarker, 'click')
             return
         }

@@ -341,7 +341,7 @@ export const MapController = (() => {
 
         }
 
-        createDropdowns(dropdownItems, { placeholder, selectSwitches, legendFilter, inputModifiers, containerModifiers = 'form-outline--icon-right', icon= 'expand_more', readOnly = false }) {
+        createDropdowns(dropdownItems, { placeholder, selectSwitches, legendFilter, inputModifiers, containerModifiers = 'form-outline--icon-right', icon= 'expand_more', readOnly = false, roadDestinationSelector }) {
             const categoryDropDown = document.createElement('div')
             categoryDropDown.classList.add('form-outline')
             categoryDropDown.classList.add(...containerModifiers.trim().split(/\s+/)) 
@@ -359,7 +359,15 @@ export const MapController = (() => {
                     ...item
                 }, () => {
                     if(!legendFilter) {
+                        
                         if(item.markerIndex === undefined) return
+
+                        if(roadDestinationSelector) {
+                            this.Map.clearActiveMarkers()
+                            this.Map.createActiveMarkers(this.markers.findIndex((marker) => marker.name === this.activeSpot.name))
+                            this.Map.createActiveMarkers(item.markerIndex)
+                            return
+                        }
                         this.unCheckAllFilters('all')
                         if(this.searchSelectZoomTimer) clearTimeout(this.searchSelectZoomTimer) 
                         const zoomLevel = this.Map.getMap().getZoom()
@@ -498,12 +506,14 @@ export const MapController = (() => {
             navigationDiv.appendChild(originCol)
 
             const markers = this.markers.filter((marker) => marker.name !== this.activeSpot.name).map(({name, value}) => {
+                const markerIndex = this.markers.findIndex(marker => marker.name === name)
                 return {
                     name,
-                    value: value || name
+                    value: value || name,
+                    markerIndex
                 }
             })
-            const destinationField = this.createDropdowns(markers, {placeholder: this.locale['Search'] || 'Search', containerModifiers: 'form-outline--rounded  form-outline--icon-right form-outline--icon-right-offseted', icon : 'location_on'})
+            const destinationField = this.createDropdowns(markers, {placeholder: this.locale['Search'] || 'Search', roadDestinationSelector: true, containerModifiers: 'form-outline--rounded  form-outline--icon-right form-outline--icon-right-offseted', icon : 'location_on'})
             destinationField.classList.add('main-navigation__destination-field')
             destinationCol.appendChild(destinationField)
             navigationDiv.appendChild(destinationCol)
@@ -551,7 +561,6 @@ export const MapController = (() => {
         }
 
         onNavigationClick() {
-            console.log(this.roads)
             const origin = this.navigationPanel.querySelector('.main-navigation__origin-field input')
             const destination = this.navigationPanel.querySelector('.main-navigation__destination-field')
             
