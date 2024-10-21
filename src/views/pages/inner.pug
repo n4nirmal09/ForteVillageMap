@@ -13,7 +13,21 @@ block content
         .aspect-ratio__inner-content 
           div.forte-map-view.interactive-map(data-map-styles="./js/data/map.style.json" data-markers="./js/data/markers.json", 
 
-          data-locale={"Go to": "vai al sito", "Close" : "vicino", "Search": "Search", "Navigation": "Navigation", "No origin selected": "Please click on the marker to select origin"},
+          data-locale={"Go to": "vai al sito", "Close" : "vicino", 
+          "Search": "Search", 
+          "Navigation": "Navigation", 
+          "No origin selected": "Please click on the marker to select origin",
+          "All": "HOI", 
+          "Category" : "Carte",
+          "Search": "Serce",
+          "Origin": "Oreg",
+          "Destination": "Desti",
+          "Navigate": "Nav",
+          "Navigation": "Navigate",
+          "Navigation Description": "Lorem ipsum doloe",
+          "Clear": "Clean",
+          "No roads": "Lorem ipsum"
+          },
 
           data-append-legends-to="#forte-map-legends"
           data-navigation="true",
@@ -56,11 +70,12 @@ block scripts
     const mapOptions = {
       "zoom": 17,
       "center": {
-        "lat": 38.93240924257542,
-        "lng": 8.931271334750678
+        "lat": 38.93465552384538,
+        "lng": 8.931505431255804
       },
       "minZoom": 17,
       "maxZoom": 20,
+      "searchItemSelectZoom": 19,
       "navigationModeZoom": 18,
       "restriction": {
         "latLngBounds": {

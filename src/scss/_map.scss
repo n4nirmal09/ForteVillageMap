@@ -40,9 +40,7 @@ $modal-width-offset-container: calc(100vw - (100vw - (260px )) );
 
 
     &-modal {
-        @include media-breakpoint-down(xs) {
-            padding-top: 110px;
-        }
+        
         width: 100%;
         max-width: $modal-width;
         padding-top: 80px;
@@ -126,14 +124,24 @@ $modal-width-offset-container: calc(100vw - (100vw - (260px )) );
     flex-direction: row;
     flex-wrap: wrap;
     &:not(.legends-list--inner) {
+
+        @include media-breakpoint-custom-down(425px) {
+            margin-left: -5px;
+            margin-right: -5px;
+        }
         margin-left: -10px;
         margin-right: -10px;
         > .legends-list__item {
+            @include media-breakpoint-custom-down(425px) {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
             padding-left: 10px;
             padding-right: 10px;
             margin-top: 5px;
             margin-bottom: 5px;
         }
+        
     }
 
     &__item {
@@ -170,7 +178,10 @@ $modal-width-offset-container: calc(100vw - (100vw - (260px )) );
     &__item-col {
             &:not(.legends-list__item-col--nav-btn) {
                 @include media-breakpoint-down(xs) {
-                    flex: 0 0 186px;
+                    flex: 1 0 156px;
+                }
+                @include media-breakpoint-custom-down(375px) {
+                    flex: 1 0 100px;
                 }
                 flex: 0 0 260px;
             }

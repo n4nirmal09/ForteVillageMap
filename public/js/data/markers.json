@@ -481,6 +481,7 @@
         "type": "restaurants-bars",
         "link": "\/dining\/restaurants\/",
         "icon": "https:\/\/www.fortevillageresort.com\/wp-content\/uploads\/2023\/10\/restaurants_map_pin_shadow_white.png",
+        "iconActive": "./images/rugby_white_map_pin_shadow-1.png",
         "description": "<p>If we may say so, it is one hell of a restaurant: that\u2019s the remarkable Hell\u2019s Kitchen, another fantastic world first to add to Forte Village\u2019s list of records.<\/p>\n"
     },
     {
@@ -1064,6 +1065,7 @@
         "type": "sport",
         "link": "\/academies\/rugby-academy\/",
         "icon": "https:\/\/www.fortevillageresort.com\/wp-content\/uploads\/2023\/10\/rugby_white_map_pin_shadow-1.png",
+        "iconActive": "./images/rugby_white_map_pin_shadow-1.png",
         "description": "<p>Want to reach the touchline and score a try for your team? Want to learn all the secrets of this fantastic game? How about meeting the rugby greats and playing with them? Then join our unbeatable Rugby Academy with Legends, with the biggest names from English and Irish rugby.<\/p>\n"
     },
     {

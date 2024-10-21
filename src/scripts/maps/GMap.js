@@ -32,7 +32,7 @@ export default class GMap {
 
         this.svgMarker = {
             path: "M8.1 4.1c0 2.2-1.8 4-4 4s-4-1.8-4-4 1.8-4 4-4 4 1.7 4 4z",
-            fillColor: "yellow",
+            fillColor: "blue",
             fillOpacity: 1,
             strokeWeight: 0,
             rotation: 0,
@@ -48,11 +48,19 @@ export default class GMap {
             scale: 8
         }
 
+        this.spotlightIcon = './images/spotlight.png'
+
         this.markers = []
         this.selectedMarker = null
 
         this.events = []
         this.groundOverlays = []
+
+        this.iconAnimateInterval = null
+        this.iconAnimateTimeout = null
+
+        this.spotlightMarker = null
+        this.mainIconMarker = null
         this.init()
     }
 
@@ -116,6 +124,7 @@ export default class GMap {
 
     iconMaker(icon, defaultIcon) {
         if (typeof icon === "string") return icon
+        if(typeof defaultIcon === "string") return defaultIcon
         return {...defaultIcon, ...icon}
     }
 
@@ -130,21 +139,41 @@ export default class GMap {
         const label = details.label || null
 
 
-        const marker = new google.maps.Marker({
+        // const circleMarker = new google.maps.Marker({
+        //     map: this.Map,
+        //     position: new google.maps.LatLng(lat, long),
+        //     icon: {
+        //         ...this.svgMarker,
+        //         scale: 3.5,  
+        //         anchor: new google.maps.Point(4, 7) 
+        //     },
+        //     zIndex: 0  // Make sure it's behind the main icon
+        // });
+
+        const mainMarker = new google.maps.Marker({
             map: this.Map,
             position: new google.maps.LatLng(lat, long),
             title: label,
             label: label,
-            icon: icon,
+            icon: typeof icon === "string" ? {
+                url: icon,
+                //scaledSize: new google.maps.Size(18, 18),
+            } : icon,
             details: {
                 ...details
-            }
+            },
+            //zIndex: 1
         })
-        marker.setMap(this.Map)
-        marker.addListener("click", () => this.markerClick(marker))
+        //mainMarker.setMap(this.Map)
+
+        const markerObj = {
+            //circleMarker,
+            mainMarker
+        }
+        markerObj.mainMarker.addListener("click", () => this.markerClick(markerObj))
         if(this.infoPopup) marker.infoWindow = this.createInfoWindow(marker.details)
-        this.markers.push(marker)
-        return marker
+        this.markers.push(markerObj)
+        return markerObj
 
     }
     
@@ -152,10 +181,12 @@ export default class GMap {
     removeAllMarkers() {
         this.selectedMarker = null
         this.markers.forEach((marker) => {
-            marker.setMap(null)
+            marker.mainMarker.setMap(null)
             if(this.infoPopup) marker.infoWindow?.close()
         })
         this.markers = []
+        this.clearIconAnimateUtils()
+        this.clearActiveMarkers()
     }
 
     // GroundOverlays
@@ -229,24 +260,116 @@ export default class GMap {
 
     }
 
-    // Event handlers
-    toggleMarkerActive(marker) {
+    clearIconAnimateUtils() {
+        if(this.iconAnimateInterval) {
+            clearInterval(this.iconAnimateInterval)
+            this.iconAnimateInterval = null
+        }
 
+        if(this.iconAnimateTimeout) {
+            clearTimeout(this.iconAnimateTimeout)
+            this.iconAnimateTimeout = null
+        }
+    }
+
+    clearActiveMarkers() {
+        if (this.spotlightMarker) {
+            this.spotlightMarker.setMap(null);
+        }
+        if (this.mainIconMarker) {
+            this.mainIconMarker.setMap(null);
+        }
+    }
+
+    // Event handlers
+    toggleMarkerActive({mainMarker: marker}) {
+        
+        
         if (this.selectedMarker === marker) {
             this.showInfoWindow(marker)
             return
         }
+
+        this.clearIconAnimateUtils()
+
+
         this.selectedMarker = marker
-        this.markers.forEach((marker) => {
-            const icon = this.iconMaker(marker.details.icon, this.svgMarker)
-            marker.setIcon(icon)
+        this.markers.forEach(({mainMarker: marker}) => {
+            //const icon = this.iconMaker(marker.details.icon, this.svgMarker)
+           // marker.setIcon(icon)
             marker.infoWindow?.close()
             marker.setZIndex(1)
+            marker.setAnimation(null);
         })
-        this.selectedMarker.setIcon(this.iconMaker(marker.details.iconActive || marker.details.icon, this.svgMarkerActive))
+
+        this.clearActiveMarkers()
+
+        this.createActiveMarkers(marker)
+        
+        // this.selectedMarker.setIcon(this.iconMaker(marker.details.iconActive, {
+        //     url: this.getRandomSpotlightIcon(),
+        //     scaledSize: new google.maps.Size(40, 50),
+        // }))
+        // this.selectedMarker.setZIndex(2)
+        
+        // this.markerAnimationAndRemove(this.selectedMarker)
+        // this.iconAnimateInterval = setInterval(() => {
+        //     this.markerAnimationAndRemove(this.selectedMarker)
+        // }, 8000)
+        
         this.showInfoWindow(this.selectedMarker)
-        this.selectedMarker.setZIndex(2)
+        
     }
+
+    createActiveMarkers(marker) {
+        this.spotlightMarker = new google.maps.Marker({
+            position: marker.getPosition(),
+            map: this.Map,
+            icon: {
+                url: this.getRandomSpotlightIcon(),
+                scaledSize: new google.maps.Size(40, 50),  // Size of the spotlight icon
+                anchor: new google.maps.Point(20, 58),  // Adjust anchor point to position it correctly
+            },
+            zIndex: 1,  // Ensure the spotlight stays behind the main icon
+        });
+
+        if(marker.details.icon) {
+            this.mainIconMarker = new google.maps.Marker({
+                position: marker.getPosition(),
+                map: this.Map,
+                icon: {
+                    url: marker.details.icon,  
+                    scaledSize: new google.maps.Size(24, 24),  
+                    anchor: new google.maps.Point(12, 50), 
+                },
+                zIndex: 2, 
+            });
+        }
+        
+
+        this.markerAnimationAndRemove(this.spotlightMarker)
+        if(this.mainIconMarker) this.markerAnimationAndRemove(this.mainIconMarker)
+        this.iconAnimateInterval = setInterval(() => {
+            this.markerAnimationAndRemove(this.spotlightMarker)
+            if(this.mainIconMarker) this.markerAnimationAndRemove(this.mainIconMarker)
+        }, 8000)
+    
+    }
+
+    getRandomSpotlightIcon() {
+        const colors = ['red', 'yellow', 'blue', 'dark-blue']
+        const randomColor = colors[Math.floor(Math.random() * colors.length)]
+        return `./images/spotlight-${randomColor}.png`
+    }
+
+    markerAnimationAndRemove(marker) {
+        if(!marker) return
+        marker.setAnimation(google.maps.Animation.BOUNCE)
+        this.iconAnimateTimeout =  setTimeout(() => {
+            marker.setAnimation(null)
+            this.iconAnimateTimeout = null
+        }, 2800);
+    } 
 
     
 
@@ -280,7 +403,8 @@ export default class GMap {
     // Marker Utilities
     selectMarker(marker) {
         if(typeof marker === "number") {
-            new google.maps.event.trigger(this.markers[marker], 'click')
+            console.log(marker)
+            new google.maps.event.trigger(this.markers[marker].mainMarker, 'click')
             return
         }
         new google.maps.event.trigger(marker, 'click')

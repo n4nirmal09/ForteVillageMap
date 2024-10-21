@@ -85,6 +85,8 @@ export const MapController = (() => {
             this.navigationPanelModelCloseBtn = null
             this.navigationOpenBtn = null
 
+            this.searchSelectZoomTimer = null
+
             this._init()
         }
 
@@ -232,7 +234,6 @@ export const MapController = (() => {
             
             const dropdownListItems = this.options.appendLegendsTo.querySelectorAll('.legends-list__item-col:not(.legends-list__item-col--category):not(.legends-list__item-col--search):not(.legends-list__item-col--nav-btn)')
             dropdownListItems.forEach((item) => {
-                console.log(item)
                 const sd = item.querySelector('[data-drop-down-select]')
                 if(sd) sd.getSelectDropDown().destroy()
                 item.remove()
@@ -318,6 +319,8 @@ export const MapController = (() => {
                     searchColumn.classList.remove("active");
                     
                 })
+
+                //searchColumn.addEventListener("click", () => this.unCheckAllFilters('all'))
             }
            
             
@@ -355,7 +358,26 @@ export const MapController = (() => {
                 categoryList.appendChild(this.createDropdownItem({
                     ...item
                 }, () => {
-                    if(!legendFilter) this.Map.selectMarker(item.markerIndex)
+                    if(!legendFilter) {
+                        if(item.markerIndex === undefined) return
+                        this.unCheckAllFilters('all')
+                        if(this.searchSelectZoomTimer) clearTimeout(this.searchSelectZoomTimer) 
+                        const zoomLevel = this.Map.getMap().getZoom()
+                        const toZoom = this.options.mapOptions.searchItemSelectZoom || this.options.mapOptions.maxZoom  || 20
+                        
+                        if(zoomLevel !== toZoom) {
+                            this.Map.getMap().setZoom(toZoom)
+                            this.searchSelectZoomTimer = setTimeout(() => {
+                                this.Map.selectMarker(item.markerIndex)
+                            }, 1000)
+                            return
+                        }
+
+                        this.Map.selectMarker(item.markerIndex)
+                            
+                        
+                        
+                    }
                 }, legendFilter))
             })
 
@@ -424,7 +446,7 @@ export const MapController = (() => {
             const navigationPanelModelBody = this.navigationPanelModel.querySelector(`.${this.options.classPrepend}-modal__body`)
             const navigationPanelModelTitle = this.navigationPanelModel.querySelector(`.${this.options.classPrepend}-modal__header-title`)
             navigationPanelModelTitle.innerHTML = `${this.locale["Navigation"] || ''}`
-            navigationPanelModelBody.innerHTML = ``
+            navigationPanelModelBody.innerHTML = `<p class="${this.options.classPrepend}-modal__description">${this.locale["Navigation Description"] || ''}</p>`
             navigationPanelModelBody.appendChild(this.navigationPanel)
             
             
@@ -535,6 +557,7 @@ export const MapController = (() => {
             
             const roadOverlay = this.roads.find((road) => road.origin === origin.value && road.destination === destination.getValue().value)
             if(roadOverlay) {
+                this.unCheckAllFilters('all')
                 this.showModal(false)
                 this.showNavigationModel(false)
                 this.Map.getMap().setZoom(this.options.mapOptions.navigationModeZoom || this.options.mapOptions.zoom)
@@ -781,8 +804,22 @@ export const MapController = (() => {
         }
 
         unCheckAllFilters(exception) {
-            const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input') || this.options.appendLegendsTo?.querySelector('.legends-list__item-col--category') || []
+            //const filterInputs = this.options.markersFilterElement?.querySelectorAll('.map-filter__item-input') || this.options.appendLegendsTo?.querySelector('.legends-list__item-col--category') || []
+
+            const filterInputs =  this.options.appendLegendsTo?.querySelectorAll('.map-filter__item-input') || []
+            const filterSearchInput = this.options.appendLegendsTo?.querySelector('.legends-list__item-col--category .map-filter__input ') || null
+
+            const allValues = Array.from(filterInputs).filter(input => input.checked).map(input => input.value)
+            if(allValues.length === 1 && allValues.includes(exception)) return
             filterInputs.forEach((inp) => {
+                if(exception === 'all') {
+                    if(inp.value === exception) {
+                        inp.checked = true
+                        inp.dispatchEvent(new Event('change'));
+                    }
+                    return
+                }
+
                 if(inp.checked) {
                     inp.checked = false
                     inp.dispatchEvent(new Event('change'));
@@ -792,6 +829,8 @@ export const MapController = (() => {
                     inp.dispatchEvent(new Event('change'));
                 }
             })
+
+            if(filterSearchInput) filterSearchInput.value = ''
         }
 
         // Callbacks
@@ -806,10 +845,13 @@ export const MapController = (() => {
         }
 
         onMapZoom(e) {
-            const map = e.detail.getMap()
-            const zoomLevel = map.getZoom()
+            const debouncedFunction = utilities.debounce(() => {
+                // const map = e.detail.getMap()
+                // const zoomLevel = map.getZoom()
+                this.updateGroundOverlay()
+            }, 500)
 
-            this.updateGroundOverlay()
+            debouncedFunction();
         }
 
         onFilterChange(e) {
